@@ -1,4 +1,3 @@
-
 def autosomal_recessive(parent1, parent2):
 
     p1 = parent1.strip()
@@ -38,6 +37,18 @@ def autosomal_recessive(parent1, parent2):
             "Affected": 50
         }
 
+    elif (
+        (p1 == "AA" and p2 == "aa") or
+        (p1 == "aa" and p2 == "AA")
+    ):
+        # Homozygous unaffected x homozygous affected: every offspring
+        # inherits one A and one a, so all are carriers.
+        return {
+            "Healthy": 0,
+            "Carrier": 100,
+            "Affected": 0
+        }
+
     elif p1 == "aa" and p2 == "aa":
         return {
             "Healthy": 0,
@@ -45,6 +56,14 @@ def autosomal_recessive(parent1, parent2):
             "Affected": 100
         }
 
+    # Truly invalid genotype strings (anything other than AA/Aa/aa) still
+    # return the SAME shape as every valid case above, instead of a
+    # single-key error dict. This guarantees report_service.py and any
+    # other caller can always safely read Healthy/Carrier/Affected,
+    # regardless of what was typed into the genotype fields.
     return {
-        "Error": "Invalid genotype. Use only AA, Aa or aa."
+        "Healthy": None,
+        "Carrier": None,
+        "Affected": None,
+        "Error": "Invalid genotype. Use only AA, Aa or aa.",
     }

@@ -24,6 +24,8 @@ import {
   type ReportListItem,
   type ReportDetail,
 } from "@/services/api";
+import { getTierStyle } from "@/lib/evidenceTier";
+import CrisprEvidenceNotice from "@/components/shared/CrisprEvidenceNotice";
 
 type RiskFilter = "all" | "low" | "medium" | "high";
 type SortOption = "date_desc" | "date_asc" | "risk_desc" | "risk_asc";
@@ -58,6 +60,61 @@ function triggerBlobDownload(blob: Blob, filename: string) {
   link.click();
   link.remove();
   window.URL.revokeObjectURL(url);
+}
+
+// ---------------------------------------------------------------------------
+// CRISPR section inside the detail modal — uses the exact same evidence-tier
+// decision logic as both CRISPRCard.tsx files, via getTierStyle() and the
+// shared CrisprEvidenceNotice component. This guarantees Report History can
+// never show CRISPR information inconsistently with the Analysis or CRISPR
+// Recommendations pages.
+// ---------------------------------------------------------------------------
+function ReportCrisprSection({ report }: { report: ReportDetail }) {
+  if (!report.recommendation) return null;
+
+  const tierStyle = getTierStyle(report.recommendation.evidence_tier);
+
+  return (
+    <div className="rounded-xl border border-ink-900/10 p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-ink-900">CRISPR Recommendation</p>
+        {report.recommendation.evidence_tier && tierStyle.hasValidatedDetails && (
+          <span
+            className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${tierStyle.badgeClasses}`}
+          >
+            {tierStyle.label}
+          </span>
+        )}
+      </div>
+
+      {tierStyle.hasValidatedDetails ? (
+        <dl className="space-y-1.5 text-sm">
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-400">Gene</dt>
+            <dd className="font-mono text-ink-800">{report.recommendation.gene || "—"}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-400">Mutation</dt>
+            <dd className="font-mono text-ink-800">{report.recommendation.mutation || "—"}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-400">Editing Method</dt>
+            <dd className="text-ink-800">{report.recommendation.editing_method || "—"}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-400">Success Rate</dt>
+            <dd className="text-ink-800">
+              {report.recommendation.success_rate != null
+                ? `${report.recommendation.success_rate}%`
+                : "—"}
+            </dd>
+          </div>
+        </dl>
+      ) : (
+        <CrisprEvidenceNotice recommendation={report.recommendation} />
+      )}
+    </div>
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -125,31 +182,7 @@ function ReportDetailModal({
                 </div>
               </div>
 
-              {report.recommendation && (
-                <div className="rounded-xl border border-ink-900/10 p-4">
-                  <p className="mb-2 text-sm font-semibold text-ink-900">
-                    CRISPR Recommendation
-                  </p>
-                  <dl className="space-y-1.5 text-sm">
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-ink-400">Gene</dt>
-                      <dd className="font-mono text-ink-800">{report.recommendation.gene}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-ink-400">Mutation</dt>
-                      <dd className="font-mono text-ink-800">{report.recommendation.mutation}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-ink-400">Editing Method</dt>
-                      <dd className="text-ink-800">{report.recommendation.editing_method}</dd>
-                    </div>
-                    <div className="flex justify-between gap-4">
-                      <dt className="text-ink-400">Success Rate</dt>
-                      <dd className="text-ink-800">{report.recommendation.success_rate}%</dd>
-                    </div>
-                  </dl>
-                </div>
-              )}
+              <ReportCrisprSection report={report} />
 
               {report.inheritance && (
                 <div className="rounded-xl border border-ink-900/10 p-4">
@@ -322,8 +355,6 @@ export default function ReportsPage() {
         return prev.filter((id) => id !== reportId);
       }
       if (prev.length >= 2) {
-        // Replace the oldest selection so the user can always pick a new
-        // second item without having to manually deselect first.
         return [prev[1], reportId];
       }
       return [...prev, reportId];
@@ -382,7 +413,6 @@ export default function ReportsPage() {
           </CardHeader>
 
           <CardContent className="space-y-5">
-            {/* Controls */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative flex-1">
                 <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
@@ -457,7 +487,6 @@ export default function ReportsPage() {
               </div>
             )}
 
-            {/* List */}
             {filteredReports.length === 0 ? (
               <p className="py-8 text-center text-sm text-ink-400">
                 No reports match your search or filter.
@@ -547,7 +576,6 @@ export default function ReportsPage() {
         </Card>
       )}
 
-      {/* View / Compare modal */}
       {modalReports && (
         <ReportDetailModal
           reports={modalReports}
@@ -555,7 +583,6 @@ export default function ReportsPage() {
         />
       )}
 
-      {/* Delete confirmation */}
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/50 p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">

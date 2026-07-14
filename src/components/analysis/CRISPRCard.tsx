@@ -1,11 +1,10 @@
 import { Dna, Scissors, Percent, ShieldCheck, BookOpen, Info } from "lucide-react";
 import type { PredictionRecommendation } from "@/services/api";
+import { getTierStyle } from "@/lib/evidenceTier";
+import CrisprEvidenceNotice from "@/components/shared/CrisprEvidenceNotice";
 
 interface CRISPRCardProps {
-  recommendation: PredictionRecommendation & {
-    available?: boolean;
-    message?: string | null;
-  };
+  recommendation: PredictionRecommendation;
 }
 
 function StatusPill({ value }: { value?: string | null }) {
@@ -51,25 +50,36 @@ function Tile({
 }
 
 export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
-  const isUnavailable = recommendation.available === false;
+  const isTotallyUnavailable = recommendation.available === false && !recommendation.gene;
+  const tierStyle = getTierStyle(recommendation.evidence_tier);
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <div className="mb-6 flex items-center gap-3">
-        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
-          <Dna className="h-5 w-5" />
-        </span>
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">
-            CRISPR Recommendation
-          </h3>
-          <p className="text-sm text-slate-500">
-            Suggested gene editing approach based on the identified mutation.
-          </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <Dna className="h-5 w-5" />
+          </span>
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900">
+              CRISPR Recommendation
+            </h3>
+            <p className="text-sm text-slate-500">
+              Suggested gene editing approach based on the identified mutation.
+            </p>
+          </div>
         </div>
+
+        {recommendation.evidence_tier && tierStyle.hasValidatedDetails && (
+          <span
+            className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tierStyle.badgeClasses}`}
+          >
+            {tierStyle.label}
+          </span>
+        )}
       </div>
 
-      {isUnavailable ? (
+      {isTotallyUnavailable ? (
         <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
           <Info className="h-5 w-5 flex-shrink-0" />
           <p className="text-sm">
@@ -77,7 +87,7 @@ export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
               "CRISPR recommendation is currently unavailable for this disease."}
           </p>
         </div>
-      ) : (
+      ) : tierStyle.hasValidatedDetails ? (
         <>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Tile label="Gene" value={recommendation.gene} mono wide />
@@ -129,6 +139,8 @@ export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
             </div>
           )}
         </>
+      ) : (
+        <CrisprEvidenceNotice recommendation={recommendation} />
       )}
     </div>
   );

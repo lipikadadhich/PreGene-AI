@@ -1,50 +1,59 @@
-import { Scissors, Dna, Gauge, Info } from "lucide-react";
+import { Scissors, Dna, Gauge } from "lucide-react";
 import type { Recommendation } from "@/types/prediction";
+import { getTierStyle } from "@/lib/evidenceTier";
+import CrisprEvidenceNotice from "@/components/shared/CrisprEvidenceNotice";
 
 interface CRISPRCardProps {
-  recommendation: Recommendation & {
-    available?: boolean;
-    message?: string | null;
-  };
+  recommendation: Recommendation;
 }
 
 /**
- * Displays the CRISPR gene-editing portion of a prediction result: target
- * gene, mutation, editing method, and predicted success rate.
+ * Displays the CRISPR gene-editing portion of a prediction result. For
+ * curated/validated evidence tiers, shows gene, mutation, editing method,
+ * and success rate as before. For theoretical/no-strategy tiers, renders
+ * the shared CrisprEvidenceNotice — the same component used on every
+ * other page that can show a CRISPR recommendation.
  */
 export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
-  const isUnavailable = recommendation.available === false;
+  const isTotallyUnavailable = recommendation.available === false && !recommendation.gene;
+  const tierStyle = getTierStyle(recommendation.evidence_tier);
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.08)]">
       <div
         aria-hidden="true"
-        className="absolute inset-x-0 top-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600"
+        className={`absolute inset-x-0 top-0 h-[3px] rounded-t-2xl bg-gradient-to-r ${tierStyle.cardAccentClasses}`}
       />
 
-      <div className="flex items-start gap-3.5">
-        <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
-          <Scissors className="h-5 w-5" aria-hidden="true" />
-        </span>
-        <div>
-          <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
-            CRISPR Recommendation
-          </h3>
-          <p className="mt-0.5 text-sm text-slate-400">
-            Suggested precision gene-editing intervention.
-          </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3.5">
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+            <Scissors className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div>
+            <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
+              CRISPR Recommendation
+            </h3>
+            <p className="mt-0.5 text-sm text-slate-400">
+              Suggested precision gene-editing intervention.
+            </p>
+          </div>
         </div>
+
+        {recommendation.evidence_tier && tierStyle.hasValidatedDetails && (
+          <span
+            className={`flex-shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${tierStyle.badgeClasses}`}
+          >
+            {tierStyle.label}
+          </span>
+        )}
       </div>
 
-      {isUnavailable ? (
-        <div className="mt-6 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
-          <Info className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-          <p className="text-sm">
-            {recommendation.message ||
-              "CRISPR recommendation is currently unavailable for this disease."}
-          </p>
+      {isTotallyUnavailable ? (
+        <div className="mt-6">
+          <CrisprEvidenceNotice recommendation={recommendation} />
         </div>
-      ) : (
+      ) : tierStyle.hasValidatedDetails ? (
         <>
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
             <div>
@@ -92,6 +101,10 @@ export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
             </div>
           </div>
         </>
+      ) : (
+        <div className="mt-6">
+          <CrisprEvidenceNotice recommendation={recommendation} />
+        </div>
       )}
     </div>
   );

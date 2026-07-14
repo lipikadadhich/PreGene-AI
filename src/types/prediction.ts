@@ -19,11 +19,18 @@ export interface PatientFormData {
   mother_genotype: string;
 }
 
+export type EvidenceTier =
+  | "FDA_APPROVED"
+  | "CLINICAL_TRIAL"
+  | "STRONG_PRECLINICAL"
+  | "EXPERIMENTAL"
+  | "THEORETICAL_CANDIDATE"
+  | "NO_KNOWN_STRATEGY";
+
 export interface Recommendation {
   gene: string;
   mutation: string;
   editing_method: string;
-  success_rate: number;
   clinical_status?: string;
   evidence?: string;
   reference?: string;
@@ -31,6 +38,14 @@ export interface Recommendation {
   disease_category?: string;
   inheritance_type?: string;
   ai_reasoning?: string;
+  success_rate: number;
+
+  // Evidence-tier system fields (backend: evidence_tiers.py)
+  available?: boolean;
+  message?: string | null;
+  evidence_tier?: EvidenceTier;
+  sources?: string[];
+  explanation?: string | null;
 }
 
 export interface InheritanceProbability {

@@ -98,9 +98,6 @@ export async function getHealthStatus(): Promise<HealthResponse> {
 // ==============================
 // AI Prediction (legacy synchronous call)
 // ==============================
-// NOTE: superseded by startPrediction() + getPredictionStatus() below, now
-// that /predict/ returns a job_id instead of blocking until done. Left in
-// place until fully confirmed unused, then removed during a future cleanup.
 export async function predictDisease(data: unknown) {
   const response = await fetch(`${API_URL}/predict/`, {
     method: "POST",
@@ -130,6 +127,14 @@ export type PipelineStage =
   | "counselling"
   | "report_generation";
 
+export type EvidenceTier =
+  | "FDA_APPROVED"
+  | "CLINICAL_TRIAL"
+  | "STRONG_PRECLINICAL"
+  | "EXPERIMENTAL"
+  | "THEORETICAL_CANDIDATE"
+  | "NO_KNOWN_STRATEGY";
+
 export interface PredictionRecommendation {
   gene: string;
   mutation: string;
@@ -142,6 +147,13 @@ export interface PredictionRecommendation {
   disease_category?: string;
   inheritance_type?: string;
   ai_reasoning?: string;
+
+  // Evidence-tier system fields (backend: evidence_tiers.py)
+  available?: boolean;
+  message?: string | null;
+  evidence_tier?: EvidenceTier;
+  sources?: string[];
+  explanation?: string | null;
 }
 
 export interface PredictionInheritance {
