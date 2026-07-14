@@ -1,0 +1,501 @@
+Disease,Inheritance_Type,Father_Carrier,Mother_Carrier,Family_History,Consanguinity,Risk_Level
+Phenylketonuria,Autosomal Recessive,Yes,No,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,No,No,Yes,Low
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,No,High
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,Yes,Low
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,Yes,High
+Marfan Syndrome,Autosomal Dominant,No,Yes,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,No,Low
+Hemophilia A,X-linked Recessive,Yes,No,Yes,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Huntington Disease,Autosomal Dominant,Yes,Yes,Yes,No,High
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,Yes,High
+Huntington Disease,Autosomal Dominant,Yes,Yes,No,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,No,No,Yes,Yes,Low
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,No,Yes,High
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,No,High
+Marfan Syndrome,Autosomal Dominant,No,No,No,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,No,Low
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,Yes,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,No,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,No,No,No,Yes,Low
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,No,High
+Hemophilia A,X-linked Recessive,No,Yes,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,Yes,No,Yes,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,Yes,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,No,No,Yes,Yes,Low
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Marfan Syndrome,Autosomal Dominant,No,No,No,No,Low
+Phenylketonuria,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,Yes,High
+Phenylketonuria,Autosomal Recessive,No,No,No,No,Low
+Phenylketonuria,Autosomal Recessive,Yes,No,No,No,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,No,High
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,No,Yes,Low
+Hemophilia A,X-linked Recessive,No,No,No,No,Low
+Hemophilia A,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,No,No,Low
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,Yes,Low
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Phenylketonuria,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,Yes,Yes,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,Yes,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,No,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,Yes,Low
+Huntington Disease,Autosomal Dominant,Yes,Yes,Yes,No,High
+Marfan Syndrome,Autosomal Dominant,No,No,No,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,Yes,No,High
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,No,No,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,No,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,No,Yes,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,Yes,High
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,Yes,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,No,Medium
+Hemophilia A,X-linked Recessive,No,Yes,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,Yes,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Phenylketonuria,Autosomal Recessive,No,No,No,No,Low
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Hemophilia A,X-linked Recessive,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,No,Yes,High
+Hemophilia A,X-linked Recessive,Yes,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,Yes,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,No,Yes,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Huntington Disease,Autosomal Dominant,Yes,No,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,No,Low
+Huntington Disease,Autosomal Dominant,No,No,No,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,Yes,Yes,No,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,Yes,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,No,High
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,No,Yes,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,No,Low
+Hemophilia A,X-linked Recessive,No,Yes,No,No,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,No,No,High
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,No,No,Yes,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,Yes,High
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,No,No,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,No,No,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,Yes,Yes,Medium
+Huntington Disease,Autosomal Dominant,Yes,No,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Sickle Cell Disease,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Beta Thalassemia,Autosomal Recessive,No,No,Yes,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,Yes,High
+Sickle Cell Disease,Autosomal Recessive,No,Yes,Yes,No,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,No,No,No,Yes,Low
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Phenylketonuria,Autosomal Recessive,Yes,Yes,Yes,No,High
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,No,Yes,Low
+Huntington Disease,Autosomal Dominant,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,No,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,No,High
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,No,Medium
+Huntington Disease,Autosomal Dominant,Yes,Yes,Yes,Yes,High
+Huntington Disease,Autosomal Dominant,Yes,No,No,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,Yes,Yes,High
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,No,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,Yes,No,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,Yes,Low
+Phenylketonuria,Autosomal Recessive,Yes,Yes,No,No,High
+Huntington Disease,Autosomal Dominant,No,Yes,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,No,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,No,Yes,High
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,No,High
+Phenylketonuria,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,No,Yes,High
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,No,Yes,No,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,Yes,No,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,No,Medium
+Sickle Cell Disease,Autosomal Recessive,No,No,No,Yes,Low
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,Yes,High
+Huntington Disease,Autosomal Dominant,Yes,Yes,No,Yes,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Hemophilia A,X-linked Recessive,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Huntington Disease,Autosomal Dominant,Yes,Yes,No,Yes,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,No,High
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,Yes,High
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,No,No,No,Yes,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,Yes,No,Medium
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,Yes,No,No,Low
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Cystic Fibrosis,Autosomal Recessive,Yes,No,Yes,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,No,Yes,High
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,No,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,No,High
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,No,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,No,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,No,Low
+Hemophilia A,X-linked Recessive,Yes,No,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,Yes,Low
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,Yes,High
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,No,No,High
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,No,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,No,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,Yes,High
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,No,Low
+Phenylketonuria,Autosomal Recessive,No,No,No,Yes,Low
+Marfan Syndrome,Autosomal Dominant,Yes,No,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,No,Medium
+Hemophilia A,X-linked Recessive,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,Yes,No,Medium
+Hemophilia A,X-linked Recessive,Yes,No,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,Yes,Low
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,No,No,High
+Phenylketonuria,Autosomal Recessive,No,No,No,No,Low
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,No,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,No,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,No,Yes,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,No,No,High
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Phenylketonuria,Autosomal Recessive,No,No,Yes,Yes,Low
+Hemophilia A,X-linked Recessive,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,No,No,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,No,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,No,No,No,No,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,No,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,No,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,Yes,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,No,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,Yes,High
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,No,High
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,No,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,Yes,High
+Beta Thalassemia,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,Yes,Low
+Marfan Syndrome,Autosomal Dominant,No,Yes,Yes,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,No,Medium
+Phenylketonuria,Autosomal Recessive,No,No,Yes,No,Low
+Huntington Disease,Autosomal Dominant,No,No,No,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Sickle Cell Disease,Autosomal Recessive,Yes,No,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,No,No,Yes,No,Low
+Huntington Disease,Autosomal Dominant,Yes,No,No,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Huntington Disease,Autosomal Dominant,Yes,No,Yes,No,Medium
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,No,No,Medium
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,No,Yes,Low
+Huntington Disease,Autosomal Dominant,No,No,No,Yes,Low
+Huntington Disease,Autosomal Dominant,Yes,Yes,No,No,High
+Marfan Syndrome,Autosomal Dominant,Yes,No,Yes,No,Medium
+Hemophilia A,X-linked Recessive,Yes,No,Yes,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Marfan Syndrome,Autosomal Dominant,No,Yes,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Huntington Disease,Autosomal Dominant,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,No,No,Yes,Yes,Low
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,No,Yes,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Hemophilia A,X-linked Recessive,Yes,Yes,Yes,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,No,Medium
+Hemophilia A,X-linked Recessive,No,No,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Cystic Fibrosis,Autosomal Recessive,Yes,No,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Phenylketonuria,Autosomal Recessive,Yes,Yes,No,Yes,High
+Hemophilia A,X-linked Recessive,No,Yes,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,Yes,No,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,No,High
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,Yes,No,High
+Sickle Cell Disease,Autosomal Recessive,No,Yes,No,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,Yes,No,Low
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Huntington Disease,Autosomal Dominant,Yes,Yes,Yes,No,High
+Huntington Disease,Autosomal Dominant,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Hemophilia A,X-linked Recessive,No,No,Yes,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,No,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Phenylketonuria,Autosomal Recessive,No,No,No,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,No,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,No,No,No,Yes,Low
+Tay-Sachs Disease,Autosomal Recessive,No,Yes,No,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,No,High
+Huntington Disease,Autosomal Dominant,Yes,No,Yes,No,Medium
+Huntington Disease,Autosomal Dominant,Yes,Yes,Yes,No,High
+Hemophilia A,X-linked Recessive,No,Yes,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,Yes,Yes,No,Yes,High
+Hemophilia A,X-linked Recessive,Yes,No,No,Yes,Medium
+Marfan Syndrome,Autosomal Dominant,No,No,No,Yes,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,Yes,No,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,No,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,No,Yes,Low
+Beta Thalassemia,Autosomal Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,No,Medium
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,No,High
+Hemophilia A,X-linked Recessive,No,Yes,Yes,No,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,Yes,Yes,High
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Huntington Disease,Autosomal Dominant,No,No,Yes,No,Low
+Phenylketonuria,Autosomal Recessive,No,Yes,No,Yes,Medium
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,No,Yes,Medium
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,Yes,Yes,No,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,Yes,Yes,Medium
+Huntington Disease,Autosomal Dominant,No,No,Yes,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,No,No,High
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,No,Yes,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,No,Yes,Low
+Tay-Sachs Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Phenylketonuria,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Beta Thalassemia,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,No,Yes,Low
+Sickle Cell Disease,Autosomal Recessive,Yes,Yes,No,No,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,Yes,No,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Hemophilia A,X-linked Recessive,No,No,Yes,Yes,Low
+Huntington Disease,Autosomal Dominant,No,No,No,No,Low
+Sickle Cell Disease,Autosomal Recessive,No,No,Yes,Yes,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,No,No,No,Yes,Low
+Spinal Muscular Atrophy,Autosomal Recessive,No,Yes,No,Yes,Medium
+Hemophilia A,X-linked Recessive,Yes,Yes,No,No,High
+Huntington Disease,Autosomal Dominant,No,Yes,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,Yes,No,Yes,High
+Phenylketonuria,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,No,No,High
+Duchenne Muscular Dystrophy,X-linked Recessive,No,Yes,No,No,Low
+Tay-Sachs Disease,Autosomal Recessive,No,No,No,Yes,Low
+Cystic Fibrosis,Autosomal Recessive,Yes,No,No,Yes,Medium
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,Yes,No,Yes,High
+Beta Thalassemia,Autosomal Recessive,No,No,No,No,Low
+Hemophilia A,X-linked Recessive,No,No,No,No,Low
+Beta Thalassemia,Autosomal Recessive,Yes,Yes,Yes,Yes,High
+Phenylketonuria,Autosomal Recessive,Yes,No,No,Yes,Medium
+Sickle Cell Disease,Autosomal Recessive,Yes,No,Yes,Yes,Medium
+Cystic Fibrosis,Autosomal Recessive,No,No,No,No,Low
+Spinal Muscular Atrophy,Autosomal Recessive,Yes,No,Yes,No,Medium
+Hemophilia A,X-linked Recessive,Yes,No,No,No,Low
+Marfan Syndrome,Autosomal Dominant,No,No,Yes,No,Low
+Duchenne Muscular Dystrophy,X-linked Recessive,Yes,No,No,No,Low
