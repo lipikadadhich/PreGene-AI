@@ -1,0 +1,160 @@
+import {
+  CheckCircle2,
+  Loader2,
+  Circle,
+  AlertCircle,
+  ClipboardCheck,
+  GitBranch,
+  Activity,
+  Scissors,
+  HeartPulse,
+  FileText,
+} from "lucide-react";
+import type { PipelineStage, PredictionJobStatus } from "@/services/api";
+
+interface StageMeta {
+  key: PipelineStage;
+  label: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+// Order and labels here must match PIPELINE_STAGES in job_service.py —
+// each one maps to a real backend function, not an invented step.
+const STAGES: StageMeta[] = [
+  {
+    key: "validate_input",
+    label: "Validate Input",
+    description: "Checking patient and family details",
+    icon: ClipboardCheck,
+  },
+  {
+    key: "inheritance",
+    label: "Inheritance Analysis",
+    description: "Computing autosomal inheritance probability",
+    icon: GitBranch,
+  },
+  {
+    key: "risk_prediction",
+    label: "AI Risk Prediction",
+    description: "Scoring genetic disease risk",
+    icon: Activity,
+  },
+  {
+    key: "crispr_recommendation",
+    label: "CRISPR Recommendation",
+    description: "Matching a gene editing strategy",
+    icon: Scissors,
+  },
+  {
+    key: "counselling",
+    label: "Genetic Counselling",
+    description: "Generating guidance notes",
+    icon: HeartPulse,
+  },
+  {
+    key: "report_generation",
+    label: "Report Generation",
+    description: "Compiling the clinical report",
+    icon: FileText,
+  },
+];
+
+interface AnalysisPipelineProps {
+  job: PredictionJobStatus;
+}
+
+export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-slate-900">
+          Running Analysis
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          {job.overall_status === "error"
+            ? "The analysis stopped due to an error below."
+            : "Each step below reflects real backend progress."}
+        </p>
+      </div>
+
+      <ol className="space-y-3">
+        {STAGES.map((stage) => {
+          const status = job.stages[stage.key];
+          const Icon = stage.icon;
+
+          const isComplete = status === "complete";
+          const isRunning = status === "running";
+          const isError = status === "error";
+
+          return (
+            <li
+              key={stage.key}
+              className={`flex items-center gap-4 rounded-xl border p-4 transition-colors duration-200 ${
+                isError
+                  ? "border-red-200 bg-red-50"
+                  : isRunning
+                  ? "border-brand-200 bg-brand-50"
+                  : isComplete
+                  ? "border-emerald-200 bg-emerald-50"
+                  : "border-slate-200 bg-slate-50"
+              }`}
+            >
+              <span
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${
+                  isError
+                    ? "bg-red-100 text-red-600"
+                    : isRunning
+                    ? "bg-brand-100 text-brand-600"
+                    : isComplete
+                    ? "bg-emerald-100 text-emerald-600"
+                    : "bg-slate-100 text-slate-400"
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+              </span>
+
+              <div className="min-w-0 flex-1">
+                <p
+                  className={`text-sm font-medium ${
+                    isError
+                      ? "text-red-700"
+                      : isRunning
+                      ? "text-brand-700"
+                      : isComplete
+                      ? "text-emerald-700"
+                      : "text-slate-500"
+                  }`}
+                >
+                  {stage.label}
+                </p>
+                <p className="mt-0.5 text-xs text-slate-400">
+                  {stage.description}
+                </p>
+              </div>
+
+              <span className="flex-shrink-0" aria-hidden="true">
+                {isError ? (
+                  <AlertCircle className="h-5 w-5 text-red-600" />
+                ) : isRunning ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-brand-600" />
+                ) : isComplete ? (
+                  <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                ) : (
+                  <Circle className="h-5 w-5 text-slate-300" />
+                )}
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+
+      {job.overall_status === "error" && job.error && (
+        <div className="mt-5 flex gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+          <AlertCircle className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+          <span className="text-sm">{job.error}</span>
+        </div>
+      )}
+    </div>
+  );
+}
