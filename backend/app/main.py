@@ -98,6 +98,15 @@ def get_disease(disease_name: str):
 
     return {
         "found": True,
+        "data": row.to_dict()
+    }
+
+    print("Columns:", df.columns.tolist())
+    print("Row:")
+    print(row)
+
+    return {
+        "found": True,
         "Disease": row["Disease"],
         "Gene": row["Gene"],
         "Gene_Name": row["Gene_Name"],
