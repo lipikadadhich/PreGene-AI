@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+import pandas as pd
 from app.routes import (
     prediction_router,
     report_router,
@@ -99,9 +100,15 @@ def get_disease(disease_name: str):
         print("Row Index:", row.index.tolist())
         print("Row Dict:", row.to_dict())
         print("===========================")
+
+        data = {
+            key: (None if pd.isna(value) else str(value))
+            for key, value in row.to_dict().items()
+        }
+
         return {
             "found": True,
-            "data": row.to_dict()
+            "data": data
         }
     except Exception as e:
         import traceback
