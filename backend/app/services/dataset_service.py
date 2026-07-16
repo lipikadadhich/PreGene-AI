@@ -10,7 +10,7 @@ class DatasetService:
         print("Loading disease dataset...")
         try:
             # Note: Adjust this path if your CSV is saved somewhere else!
-            dataset_path = os.path.join(os.path.dirname(__file__), "../../data/disease_genes.csv")
+            dataset_path = os.path.join(os.path.dirname(__file__), "../../datasets/pregene_master_dataset.csv")
             self._df = pd.read_csv(dataset_path)
             print(f"Successfully loaded {len(self._df)} records.")
         except Exception as e:
