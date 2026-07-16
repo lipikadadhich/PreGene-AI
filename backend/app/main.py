@@ -29,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.on_event("startup")
 def startup_event():
     print("STARTUP EVENT RUNNING")
@@ -95,11 +96,6 @@ def get_disease(disease_name: str):
         }
 
     row = result.iloc[0]
-
-    return {
-        "found": True,
-        "data": row.to_dict()
-    }
 
     print("Columns:", df.columns.tolist())
     print("Row:")
