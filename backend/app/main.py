@@ -83,32 +83,32 @@ def get_diseases():
 
 @app.get("/disease/{disease_name}")
 def get_disease(disease_name: str):
-    df = dataset_service.get_dataset()
-
-    result = df[
-        df["Disease"].str.lower() == disease_name.lower()
-    ]
-
-    if result.empty:
+    try:
+        df = dataset_service.get_dataset()
+        result = df[
+            df["Disease"].str.lower() == disease_name.lower()
+        ]
+        if result.empty:
+            return {
+                "found": False,
+                "message": "Disease not found"
+            }
+        row = result.iloc[0]
+        print("========== DEBUG ==========")
+        print("Columns:", df.columns.tolist())
+        print("Row Index:", row.index.tolist())
+        print("Row Dict:", row.to_dict())
+        print("===========================")
         return {
-            "found": False,
-            "message": "Disease not found"
+            "found": True,
+            "data": row.to_dict()
         }
-
-    row = result.iloc[0]
-
-    print("Columns:", df.columns.tolist())
-    print("Row:")
-    print(row)
-
-    return {
-        "found": True,
-        "Disease": row["Disease"],
-        "Gene": row["Gene"],
-        "Gene_Name": row["Gene_Name"],
-        "Age_Of_Onset": row["Age_Of_Onset"],
-        "Inheritance_Type": row["Inheritance_Type"]
-    }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {
+            "error": str(e)
+        }
 
 
 @app.get("/search")
