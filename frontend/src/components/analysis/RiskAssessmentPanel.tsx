@@ -131,7 +131,7 @@ export default function RiskAssessmentPanel({
             type="button"
             disabled={!result.pdf}
             onClick={() =>
-              window.open("http://127.0.0.1:8000/report/download", "_blank")
+              window.open("https://pregene-ai.onrender.com/report/download", "_blank")
             }
             className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
