@@ -128,7 +128,14 @@ def search_disease(q: str = Query(..., min_length=2)):
         .head(10)
     )
 
-    return results.to_dict(orient="records")
+    records = results.to_dict(orient="records")
+
+    for record in records:
+        for key, value in record.items():
+            if pd.isna(value):
+                record[key] = None
+
+    return records
 
 
 print("Prediction:", type(prediction_router))
