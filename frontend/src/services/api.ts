@@ -1,4 +1,4 @@
-const API_URL = "https://pregene-ai.onrender.com";
+const API_URL = "https://pregene-ai-1.onrender.com";
 
 // ==============================
 // Disease Search
@@ -34,14 +34,20 @@ export async function getDiseaseList(): Promise<DiseaseListResponse> {
 // ==============================
 // Disease Detail
 // ==============================
+export interface DiseaseDetailData {
+  Disease?: string | null;
+  Gene?: string | null;
+  Gene_Name?: string | null;
+  Age_Of_Onset?: string | null;
+  Inheritance_Type?: string | null;
+  [key: string]: string | null | undefined;
+}
+
 export interface DiseaseDetailResponse {
   found: boolean;
   message?: string;
-  Disease?: string;
-  Gene?: string;
-  Gene_Name?: string;
-  Age_Of_Onset?: string;
-  Inheritance_Type?: string;
+  data?: DiseaseDetailData;
+  error?: string;
 }
 
 export async function getDiseaseDetail(

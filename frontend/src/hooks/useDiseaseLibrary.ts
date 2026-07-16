@@ -106,13 +106,14 @@ export function useDiseaseLibrary() {
       setDetailCache((prev) => {
         const next = new Map(prev);
         for (const [name, detail] of results) {
-          if (detail && detail.found) {
+          if (detail && detail.found && detail.data) {
+            const d = detail.data;
             next.set(name, {
-              Disease: detail.Disease || name,
-              Gene: detail.Gene,
-              Gene_Name: detail.Gene_Name,
-              Age_Of_Onset: detail.Age_Of_Onset,
-              Inheritance_Type: detail.Inheritance_Type,
+              Disease: d.Disease || name,
+              Gene: d.Gene ?? undefined,
+              Gene_Name: d.Gene_Name ?? undefined,
+              Age_Of_Onset: d.Age_Of_Onset ?? undefined,
+              Inheritance_Type: d.Inheritance_Type ?? undefined,
             });
           } else {
             next.set(name, { Disease: name });

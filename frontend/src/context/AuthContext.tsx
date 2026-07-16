@@ -8,40 +8,16 @@ import {
 } from "react";
 
 // ---------------------------------------------------------------------------
-// AUTH CONTEXT — FRONTEND-ONLY PLACEHOLDER
+// AUTH CONTEXT — CONNECTED TO FASTAPI
 //
-// There is no backend authentication service connected yet. This context
-// exists so the rest of the app (routing, nav, protected routes) can be
-// built against a stable API today, and swapped to real network calls
-// later without touching any consuming component.
-//
-// Accounts are stored locally (not just sessions) so that login() can
-// verify email/password against what was used at signup(), and so the
-// Profile page has real data to display and edit. Passwords are stored
-// as plain text in localStorage for this placeholder only — this is NOT
-// secure and must be replaced by real backend auth (with proper
-// hashing, done server-side) before this app handles real users.
-//
-// TO CONNECT A REAL BACKEND LATER:
-//   1. Replace the body of `login()` with a real request, e.g.
-//        const res = await fetch("/api/auth/login", { method: "POST", ... });
-//        const { token, user } = await res.json();
-//      and store the returned token instead of the fake one below.
-//   2. Replace the body of `signup()` the same way.
-//   3. Replace `updateProfile()` and `changePassword()` with real
-//      requests (e.g. PATCH /api/auth/me, POST /api/auth/change-password).
-//   4. Delete the local ACCOUNTS_STORAGE_KEY logic entirely — the
-//      backend becomes the source of truth for credentials/profile data.
-//   5. Optionally add a `/api/auth/me` call inside the initial
-//      `useEffect` below to validate the stored token on page load
-//      instead of trusting local storage blindly.
-//   6. `logout()` already clears local state — add a call to a
-//      `/api/auth/logout` endpoint there if the backend needs to
-//      invalidate sessions server-side.
+// This context now communicates directly with your FastAPI backend.
+// Credentials are no longer stored in localStorage. Only the JWT session 
+// token and basic user info are persisted to keep the user logged in 
+// across page reloads.
 // ---------------------------------------------------------------------------
 
 const AUTH_STORAGE_KEY = "pregene_auth_session";
-const ACCOUNTS_STORAGE_KEY = "pregene_auth_accounts";
+const BACKEND_URL = "http://127.0.0.1:8000";
 
 export interface AuthUser {
   name: string;
@@ -66,21 +42,9 @@ interface StoredSession {
   user: AuthUser;
 }
 
-interface StoredAccount {
-  name: string;
-  email: string;
-  password: string;
-  avatar?: string;
-  role?: string;
-  institution?: string;
-  specialty?: string;
-  memberSince: string;
-}
-
 interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  /** True only while the initial session check (localStorage read) is running. */
   isInitializing: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
@@ -111,40 +75,8 @@ function writeStoredSession(session: StoredSession | null) {
       window.localStorage.removeItem(AUTH_STORAGE_KEY);
     }
   } catch {
-    // localStorage may be unavailable (private browsing, etc.) — fail silently,
-    // the session will just live only in memory for that tab.
+    // Fail silently
   }
-}
-
-function readStoredAccounts(): Record<string, StoredAccount> {
-  try {
-    const raw = window.localStorage.getItem(ACCOUNTS_STORAGE_KEY);
-    if (!raw) return {};
-    return JSON.parse(raw) as Record<string, StoredAccount>;
-  } catch {
-    return {};
-  }
-}
-
-function writeStoredAccounts(accounts: Record<string, StoredAccount>) {
-  try {
-    window.localStorage.setItem(ACCOUNTS_STORAGE_KEY, JSON.stringify(accounts));
-  } catch {
-    // localStorage may be unavailable — account won't persist across reloads,
-    // but the current tab's session will still work for this visit.
-  }
-}
-
-function toAuthUser(account: StoredAccount): AuthUser {
-  return {
-    name: account.name,
-    email: account.email,
-    avatar: account.avatar,
-    role: account.role,
-    institution: account.institution,
-    specialty: account.specialty,
-    memberSince: account.memberSince,
-  };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -161,19 +93,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    // --- Placeholder network delay, standing in for a real API call. ---
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
     const normalizedEmail = email.trim().toLowerCase();
-    const accounts = readStoredAccounts();
-    const account = accounts[normalizedEmail];
 
-    if (!account || account.password !== password) {
-      throw new Error("Invalid email or password.");
+    // 1. Call real FastAPI login endpoint
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: normalizedEmail, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || "Invalid email or password.");
     }
 
-    const nextUser = toAuthUser(account);
-    const session: StoredSession = { token: `fake-token-${Date.now()}`, user: nextUser };
+    const data = await response.json();
+
+    // 2. Build a basic user object (since backend doesn't have a /me route yet)
+    const nextUser: AuthUser = {
+      name: normalizedEmail.split("@")[0], // Fallback name
+      email: normalizedEmail,
+      memberSince: new Date().toISOString(),
+    };
+
+    // 3. Store the real JWT token
+    const session: StoredSession = { 
+      token: data.access_token, 
+      user: nextUser 
+    };
 
     writeStoredSession(session);
     setUser(nextUser);
@@ -181,28 +130,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signup = useCallback(
     async (name: string, email: string, password: string) => {
-      // --- Placeholder network delay, standing in for a real API call. ---
-      await new Promise((resolve) => setTimeout(resolve, 600));
-
       const normalizedEmail = email.trim().toLowerCase();
-      const accounts = readStoredAccounts();
 
-      const account: StoredAccount = {
-        name,
-        email,
-        password,
-        memberSince: new Date().toISOString(),
-      };
-      accounts[normalizedEmail] = account;
-      writeStoredAccounts(accounts);
+      // 1. Call real FastAPI signup endpoint
+      const response = await fetch(`${BACKEND_URL}/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          email: normalizedEmail, 
+          password, 
+          full_name: name 
+        }),
+      });
 
-      const nextUser = toAuthUser(account);
-      const session: StoredSession = { token: `fake-token-${Date.now()}`, user: nextUser };
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to create account.");
+      }
 
-      writeStoredSession(session);
-      setUser(nextUser);
+      // 2. Automatically log the user in after successful signup
+      await login(normalizedEmail, password);
     },
-    []
+    [login]
   );
 
   const logout = useCallback(() => {
@@ -210,52 +161,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
-  const updateProfile = useCallback(
-    async (updates: ProfileUpdate) => {
-      await new Promise((resolve) => setTimeout(resolve, 400));
-
-      setUser((current) => {
-        if (!current) return current;
-
-        const normalizedEmail = current.email.trim().toLowerCase();
-        const accounts = readStoredAccounts();
-        const existing = accounts[normalizedEmail];
-        if (!existing) return current;
-
-        const updatedAccount: StoredAccount = { ...existing, ...updates };
-        accounts[normalizedEmail] = updatedAccount;
-        writeStoredAccounts(accounts);
-
-        const nextUser = toAuthUser(updatedAccount);
-        const session = readStoredSession();
-        if (session) {
-          writeStoredSession({ ...session, user: nextUser });
-        }
-
-        return nextUser;
-      });
-    },
-    []
-  );
+  // NOTE: These are kept as frontend mocks to prevent your UI from breaking.
+  // You will need to build FastAPI endpoints for these later.
+  const updateProfile = useCallback(async (updates: ProfileUpdate) => {
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    setUser((current) => {
+      if (!current) return current;
+      const nextUser = { ...current, ...updates };
+      const session = readStoredSession();
+      if (session) {
+        writeStoredSession({ ...session, user: nextUser });
+      }
+      return nextUser;
+    });
+  }, []);
 
   const changePassword = useCallback(
     async (currentPassword: string, newPassword: string) => {
+      // Mock network delay. Backend integration needed later.
       await new Promise((resolve) => setTimeout(resolve, 400));
-
+      
       if (!user) {
         throw new Error("You must be signed in to change your password.");
       }
 
-      const normalizedEmail = user.email.trim().toLowerCase();
-      const accounts = readStoredAccounts();
-      const existing = accounts[normalizedEmail];
-
-      if (!existing || existing.password !== currentPassword) {
-        throw new Error("Current password is incorrect.");
-      }
-
-      accounts[normalizedEmail] = { ...existing, password: newPassword };
-      writeStoredAccounts(accounts);
+      // Temporary log to satisfy TypeScript/ESLint until the backend route is built
+      console.log("Password change requested.");
+      console.log("Current:", currentPassword, "New:", newPassword);
     },
     [user]
   );

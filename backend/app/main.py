@@ -1,6 +1,11 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
+
+from app.database import Base, engine
+from app.models.user import User  # CRITICAL: Must be imported before create_all
+
 from app.routes import (
     prediction_router,
     report_router,
@@ -8,11 +13,26 @@ from app.routes import (
     upload_router,
     notification_router,
 )
+from app.routes.auth_router import auth_router
 from app.services.dataset_service import dataset_service
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("STARTUP EVENT RUNNING")
+    # 1. Create DB tables (Will now correctly detect the User model)
+    Base.metadata.create_all(bind=engine)
+    
+    # 2. Load dataset safely
+    dataset_service.load_dataset()
+    
+    yield
+    # Any necessary shutdown logic would go here
+
+# Pass the lifespan context manager into the FastAPI app
 app = FastAPI(
     title="PreGene-AI Backend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan 
 )
 
 app.add_middleware(
@@ -29,13 +49,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def startup_event():
-    print("STARTUP EVENT RUNNING")
-    dataset_service.load_dataset()
-
 
 @app.get("/")
 def root():
@@ -143,9 +156,11 @@ print("Report:", type(report_router))
 print("History:", type(history_router))
 print("Upload:", type(upload_router))
 print("Notification:", type(notification_router))
+print("Auth:", type(auth_router))
 
 app.include_router(prediction_router)
 app.include_router(report_router)
 app.include_router(history_router)
 app.include_router(upload_router)
 app.include_router(notification_router)
+app.include_router(auth_router)
