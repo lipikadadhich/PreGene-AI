@@ -8,6 +8,7 @@ from app.services.report_service import (
 )
 from app.services.history_service import append_history_record
 from app.services import job_service
+from app.services import notification_service
 
 
 REQUIRED_FIELDS = [
@@ -51,6 +52,15 @@ def run_analysis_job(job_id: str, data: dict) -> None:
     Intended to be called on a background thread by prediction_router.py
     so POST /predict/ can return job_id immediately.
     """
+    disease_name = data.get("disease", "Unknown disease")
+
+    notification_service.create_notification(
+        type="analysis_started",
+        title="Analysis started",
+        message=f"AI risk analysis started for {disease_name}.",
+        link="/analysis",
+    )
+
     try:
         # --- Stage 1: Validate Input ---------------------------------
         job_service.start_stage(job_id, "validate_input")
@@ -121,8 +131,22 @@ def run_analysis_job(job_id: str, data: dict) -> None:
 
         job_service.complete_stage(job_id, "report_generation")
 
+        notification_service.create_notification(
+            type="report_generated",
+            title="Report generated",
+            message=f"A clinical report for {disease_name} is ready to view.",
+            link="/reports",
+        )
+
         # --- Done -------------------------------------------------------
         job_service.complete_job(job_id, report)
+
+        notification_service.create_notification(
+            type="analysis_completed",
+            title="Analysis completed",
+            message=f"AI risk analysis for {disease_name} finished - risk level: {risk_level}.",
+            link="/analysis",
+        )
 
     except Exception as exc:
         # Whichever stage was in progress when this fired is the one
@@ -130,3 +154,10 @@ def run_analysis_job(job_id: str, data: dict) -> None:
         job = job_service.get_job(job_id)
         failed_stage = job["current_stage"] if job else "validate_input"
         job_service.fail_job(job_id, failed_stage, str(exc))
+
+        notification_service.create_notification(
+            type="analysis_failed",
+            title="Analysis failed",
+            message=f"AI risk analysis for {disease_name} failed at the '{failed_stage}' stage: {str(exc)}",
+            link="/analysis",
+        )

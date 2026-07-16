@@ -4,7 +4,7 @@ import { TESTIMONIALS } from "@/data/content";
 
 export default function Testimonials() {
   return (
-    <section id="about" className="py-28">
+    <section className="py-28">
       <div className="container">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-wide text-blue-600">

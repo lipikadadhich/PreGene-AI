@@ -4,6 +4,7 @@ import { Dna, ArrowRight, CheckCircle2, Scissors, Search, Loader2 } from "lucide
 import DnaHelix from "./DnaHelix";
 import { HERO_STATS } from "@/data/content";
 import { useDiseaseSearch } from "@/hooks/useDiseaseSearch";
+import { useAuth } from "@/hooks/useAuth";
 import DiseaseAnalysisCard from "@/components/analysis/DiseaseAnalysisCard";
 
 // ---------------------------------------------------------------------------
@@ -29,6 +30,7 @@ const fadeUp = {
 export default function Hero() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const { isAuthenticated } = useAuth();
   const { query, setQuery, results, loading, selectedDisease, selectDisease } =
     useDiseaseSearch();
 
@@ -39,6 +41,23 @@ export default function Hero() {
           animate: { y: [0, -range, 0] },
           transition: { duration, repeat: Infinity, ease: "easeInOut" as const },
         };
+
+  // Mirrors Header.tsx's "Get Started" logic — authenticated visitors go
+  // straight into the app, everyone else lands on /login. Kept in sync
+  // manually here since both live in separate landing-page components;
+  // if this diverges from Header.tsx again, consider extracting to a
+  // shared useSmartCta() hook.
+  function handleStartAnalysis() {
+    navigate(isAuthenticated ? "/dashboard" : "/login");
+  }
+
+  // TEMPORARY: there is no standalone interactive demo/walkthrough yet.
+  // Routing to /login lets visitors try the real product instead of
+  // hitting a dead or fake "demo" experience. Replace this handler with
+  // real demo content later without changing where this button lives.
+  function handleViewDemo() {
+    navigate("/login");
+  }
 
   return (
     <section id="top" className="relative overflow-hidden border-b border-slate-200 bg-slate-50">
@@ -156,20 +175,20 @@ export default function Hero() {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => navigate("/disease-prediction")}
+              onClick={handleStartAnalysis}
               className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-100 transition-colors duration-200 hover:bg-blue-700 active:bg-blue-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               Start analysis
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </motion.button>
-            <motion.a
-              href="#features"
+            <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
+              onClick={handleViewDemo}
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition-colors duration-200 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               View demo
-            </motion.a>
+            </motion.button>
           </motion.div>
 
           <motion.dl

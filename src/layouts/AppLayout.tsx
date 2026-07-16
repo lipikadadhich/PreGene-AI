@@ -16,10 +16,11 @@ export default function AppLayout() {
 
   function handleLogout() {
     // Clears the local session (see AuthContext.tsx) and returns the user
-    // to the login screen. Swap in a real API call inside logout() once a
-    // backend session needs to be invalidated server-side too.
+    // to the public Landing Page — not /login — matching the professional
+    // SaaS pattern where logging out takes you back to the marketing site,
+    // not straight to a bare login form.
     logout();
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   }
 
   return (

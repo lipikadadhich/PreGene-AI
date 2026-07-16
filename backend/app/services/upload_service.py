@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 from app.schemas.upload_schema import UploadResponse, UploadErrorResponse
+from app.services import notification_service
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -71,6 +72,12 @@ def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
     extension = _get_extension(filename)
 
     if extension not in ALLOWED_EXTENSIONS:
+        notification_service.create_notification(
+            type="dna_upload_failed",
+            title="DNA upload failed",
+            message=f"'{filename}' was rejected: unsupported file type ({extension}).",
+            link="/upload",
+        )
         return UploadErrorResponse(
             file_name=filename,
             error="Unsupported file type",
@@ -87,6 +94,12 @@ def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
     validation_status, validation_message = _validate_file(dest_path, extension)
 
     if validation_status == "invalid":
+        notification_service.create_notification(
+            type="dna_upload_failed",
+            title="DNA upload failed",
+            message=f"'{filename}' failed validation: {validation_message}",
+            link="/upload",
+        )
         return UploadErrorResponse(
             file_name=filename,
             error="File validation failed",
@@ -103,6 +116,13 @@ def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
     # metrics) is wired in — flagged clearly so it isn't mistaken for
     # a real clinical metric.
     quality_score = 95.0 if validation_status == "valid" else 60.0
+
+    notification_service.create_notification(
+        type="dna_uploaded",
+        title="DNA file uploaded",
+        message=f"'{filename}' was uploaded and validated successfully.",
+        link="/upload",
+    )
 
     return UploadResponse(
         file_name=filename,

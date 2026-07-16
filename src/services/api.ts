@@ -394,3 +394,82 @@ export async function uploadDnaFile(file: File): Promise<UploadResult> {
 
   return response.json();
 }
+
+// ==============================
+// Notifications
+// ==============================
+export type NotificationType =
+  | "dna_uploaded"
+  | "dna_upload_failed"
+  | "analysis_started"
+  | "analysis_completed"
+  | "analysis_failed"
+  | "report_generated"
+  | "report_downloaded";
+
+export interface NotificationItem {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string | null;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface NotificationListResponse {
+  notifications: NotificationItem[];
+  unread_count: number;
+}
+
+export async function getNotifications(): Promise<NotificationListResponse> {
+  const response = await fetch(`${API_URL}/notifications/list`);
+
+  if (!response.ok) {
+    throw new Error("Failed to load notifications");
+  }
+
+  return response.json();
+}
+
+export async function markNotificationRead(
+  notificationId: string
+): Promise<NotificationItem> {
+  const response = await fetch(
+    `${API_URL}/notifications/${encodeURIComponent(notificationId)}/read`,
+    { method: "POST" }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to mark notification as read");
+  }
+
+  return response.json();
+}
+
+export async function markAllNotificationsRead(): Promise<{ marked_read: number }> {
+  const response = await fetch(`${API_URL}/notifications/read-all`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to mark all notifications as read");
+  }
+
+  return response.json();
+}
+
+export async function deleteNotification(
+  notificationId: string
+): Promise<{ deleted: boolean; id: string }> {
+  const response = await fetch(
+    `${API_URL}/notifications/${encodeURIComponent(notificationId)}`,
+    { method: "DELETE" }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to delete notification");
+  }
+
+  return response.json();
+}

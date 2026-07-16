@@ -30,20 +30,13 @@ TIER_LABELS = {
     EvidenceTier.NO_KNOWN_STRATEGY: "No Known CRISPR Strategy",
 }
 
-
-# ---------------------------------------------------------------------------
-# Validated vs. non-validated tier classification.
-#
-# Mirrors `hasValidatedDetails` in the frontend's src/lib/evidenceTier.ts
-# EXACTLY. This is the one place on the backend that decides which tiers
-# are backed by curated/real-world evidence (safe to show Mutation /
-# Editing Method / Success Rate) vs. which are theoretical/absent (where
-# those fields would be blank or misleading). Any consumer that renders a
-# recommendation — PDF, future exports, etc. — should call
-# is_validated_tier() rather than re-deriving this split itself, so the
-# backend can never drift from the frontend's definition of "validated".
-# ---------------------------------------------------------------------------
-VALIDATED_TIERS = {
+# Tiers backed by curated/validated data — safe to show mutation, editing
+# method, and success rate for these. This is the Python-side counterpart
+# to hasValidatedDetails in src/lib/evidenceTier.ts on the frontend. Both
+# lists must stay in sync (same tiers on both sides) so the PDF report and
+# the UI never disagree about which tiers get full technical detail vs.
+# the gene/explanation-only presentation.
+_VALIDATED_TIERS = {
     EvidenceTier.FDA_APPROVED,
     EvidenceTier.CLINICAL_TRIAL,
     EvidenceTier.STRONG_PRECLINICAL,
@@ -51,54 +44,22 @@ VALIDATED_TIERS = {
 }
 
 
-def is_validated_tier(tier) -> bool:
+def tier_has_validated_details(tier) -> bool:
     """
-    True if `tier` is one of the curated/real-world-evidence tiers.
-    Accepts either an EvidenceTier member or its raw string value (since
-    data loaded back from JSON/history will be a plain string), and
-    degrades safely to False for None or an unrecognized value rather
-    than raising.
+    Returns True if the given tier (an EvidenceTier, its .value string, or
+    None) is backed by validated data and should show mutation/editing
+    method/success rate. Returns False for THEORETICAL_CANDIDATE,
+    NO_KNOWN_STRATEGY, or any unrecognized/missing value — mirroring the
+    frontend's safe-fallback behavior in getTierStyle().
     """
     if tier is None:
         return False
-    if not isinstance(tier, EvidenceTier):
+    if isinstance(tier, str):
         try:
             tier = EvidenceTier(tier)
         except ValueError:
             return False
-    return tier in VALIDATED_TIERS
-
-
-# Fallback scientific wording for non-validated tiers, used only when a
-# provider didn't already supply its own `explanation`/`message` text.
-# Never invents clinical data — these are neutral, accurate statements
-# about the absence of validated evidence, not fabricated findings.
-NON_VALIDATED_FALLBACK_TEXT = {
-    EvidenceTier.THEORETICAL_CANDIDATE: (
-        "Not experimentally validated. This gene association makes it a "
-        "theoretical candidate for future CRISPR-based intervention, "
-        "pending direct preclinical or clinical evidence."
-    ),
-    EvidenceTier.NO_KNOWN_STRATEGY: (
-        "No validated CRISPR strategy currently available for this disease."
-    ),
-}
-
-
-def non_validated_fallback_text(tier) -> str:
-    """
-    Returns the standard fallback explanation for a non-validated tier.
-    Falls back to the NO_KNOWN_STRATEGY message for any tier not in the
-    mapping (defensive default, mirrors is_validated_tier's safe fallback).
-    """
-    if not isinstance(tier, EvidenceTier):
-        try:
-            tier = EvidenceTier(tier)
-        except ValueError:
-            return NON_VALIDATED_FALLBACK_TEXT[EvidenceTier.NO_KNOWN_STRATEGY]
-    return NON_VALIDATED_FALLBACK_TEXT.get(
-        tier, NON_VALIDATED_FALLBACK_TEXT[EvidenceTier.NO_KNOWN_STRATEGY]
-    )
+    return tier in _VALIDATED_TIERS
 
 
 def build_recommendation_response(
@@ -136,6 +97,7 @@ def build_recommendation_response(
     return {
         "available": available,
         "message": message,
+
         "disease": disease,
         "gene": gene,
         "mutation": mutation,
@@ -146,10 +108,12 @@ def build_recommendation_response(
         "inheritance_type": inheritance_type,
         "ai_reasoning": ai_reasoning,
         "reference": reference,
+
         # Frontend fields (existing contract — confidence historically
         # mirrored success_rate; kept as-is for anything reading it today)
         "confidence": success_rate,
         "disease_category": disease_category or inheritance_type,
+
         # New, additive fields for the growing evidence system
         "evidence_tier": tier.value,
         "sources": sources or [],

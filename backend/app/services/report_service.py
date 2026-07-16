@@ -17,6 +17,8 @@ from reportlab.platypus import (
     ListItem,
 )
 
+from ai.recommendation.evidence_tiers import tier_has_validated_details
+
 
 # ---------------------------------------------------------------------------
 # Color Palette
@@ -30,6 +32,9 @@ GREY_TEXT = colors.HexColor("#6B7280")
 BORDER_GREY = colors.HexColor("#B9C4D0")
 ROW_ALT = colors.HexColor("#F4F7FB")
 WHITE = colors.white
+AMBER_BG = colors.HexColor("#FEF3C7")
+AMBER_BORDER = colors.HexColor("#F59E0B")
+AMBER_TEXT = colors.HexColor("#92400E")
 
 RISK_COLORS = {
     "LOW": colors.HexColor("#1E8449"),
@@ -95,6 +100,15 @@ def _build_styles():
         fontSize=10,
         leading=15,
         textColor=DARK_TEXT,
+        alignment=TA_JUSTIFY,
+    ))
+
+    styles.add(ParagraphStyle(
+        name="AmberNotice",
+        fontName="Helvetica",
+        fontSize=9.5,
+        leading=14,
+        textColor=AMBER_TEXT,
         alignment=TA_JUSTIFY,
     ))
 
@@ -169,6 +183,25 @@ def _grid_table(header, data_rows, col_widths):
     return table
 
 
+def _notice_box(text):
+    """
+    Amber notice box used for the theoretical-candidate / no-known-strategy
+    explanation — visually mirrors the amber notice used in the UI
+    (CrisprEvidenceNotice), so the PDF and UI present this state
+    consistently rather than looking like two different products.
+    """
+    table = Table([[_p(text, "AmberNotice")]], colWidths=[180 * mm], hAlign="LEFT")
+    table.setStyle(TableStyle([
+        ("BOX", (0, 0), (-1, -1), 0.75, AMBER_BORDER),
+        ("BACKGROUND", (0, 0), (-1, -1), AMBER_BG),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+    ]))
+    return table
+
+
 # ---------------------------------------------------------------------------
 # Header / Footer drawing
 # ---------------------------------------------------------------------------
@@ -223,10 +256,10 @@ def _make_page_callback(report_id):
 # ---------------------------------------------------------------------------
 # Report Assembly
 #
-# report_id is now generated here (not inside create_pdf) so the SAME id
-# can be used as: the PDF filename, the value stored in history_service,
-# and the id used for GET /report/{report_id} lookups later. No keys are
-# renamed or restructured beyond adding report_id.
+# report_id is generated here (not inside create_pdf) so the SAME id can
+# be used as: the PDF filename, the value stored in history_service, and
+# the id used for GET /report/{report_id} lookups. No keys are renamed or
+# restructured beyond adding report_id.
 # ---------------------------------------------------------------------------
 def generate_report(result, patient):
 
@@ -251,11 +284,13 @@ def generate_report(result, patient):
 
 
 # ---------------------------------------------------------------------------
-# PDF Builder — same layout/content as before. Now saves to a unique file
-# per report (reports/{report_id}.pdf) instead of always overwriting
-# reports/Pregene_Report.pdf, using the report_id already set on `report`
-# by generate_report() above (rather than generating a second, different
-# one here as before).
+# PDF Builder — same layout as before for validated CRISPR tiers. For
+# THEORETICAL_CANDIDATE / NO_KNOWN_STRATEGY tiers, the CRISPR section now
+# shows gene + evidence tier + explanation + data source instead of a
+# table full of "N/A" rows for fields that were never fabricated in the
+# first place. This mirrors CrisprEvidenceNotice.tsx on the frontend, so
+# the PDF and the UI can never disagree about what a theoretical
+# recommendation looks like.
 # ---------------------------------------------------------------------------
 def create_pdf(report):
 
@@ -332,20 +367,51 @@ def create_pdf(report):
 
     # -------------------- CRISPR Recommendation --------------------
     story.append(Paragraph("CRISPR Recommendation", STYLES["SectionHeading"]))
-    success_rate = recommendation["success_rate"]
-    success_rate_display = f"{success_rate}%" if success_rate not in (None, "") else "N/A"
 
-    recommendation_rows = [
-        [_p("Disease Category", "CellLabel"), _p(recommendation["disease_category"])],
-        [_p("Gene", "CellLabel"), _p(recommendation["gene"])],
-        [_p("Mutation", "CellLabel"), _p(recommendation["mutation"])],
-        [_p("Editing Method", "CellLabel"), _p(recommendation["editing_method"])],
-        [_p("Clinical Status", "CellLabel"), _p(recommendation["clinical_status"])],
-        [_p("Evidence", "CellLabel"), _p(recommendation["evidence"])],
-        [_p("Confidence", "CellLabel"), _p(recommendation["confidence"])],
-        [_p("Success Rate", "CellLabel"), _p(success_rate_display)],
-    ]
-    story.append(_section_table(recommendation_rows, col_widths=[55 * mm, 125 * mm]))
+    is_validated = tier_has_validated_details(recommendation.get("evidence_tier"))
+
+    if is_validated:
+        success_rate = recommendation["success_rate"]
+        success_rate_display = f"{success_rate}%" if success_rate not in (None, "") else "N/A"
+
+        recommendation_rows = [
+            [_p("Disease Category", "CellLabel"), _p(recommendation["disease_category"])],
+            [_p("Evidence Tier", "CellLabel"), _p(recommendation.get("evidence"))],
+            [_p("Gene", "CellLabel"), _p(recommendation["gene"])],
+            [_p("Mutation", "CellLabel"), _p(recommendation["mutation"])],
+            [_p("Editing Method", "CellLabel"), _p(recommendation["editing_method"])],
+            [_p("Clinical Status", "CellLabel"), _p(recommendation["clinical_status"])],
+            [_p("Confidence", "CellLabel"), _p(recommendation["confidence"])],
+            [_p("Success Rate", "CellLabel"), _p(success_rate_display)],
+        ]
+        story.append(_section_table(recommendation_rows, col_widths=[55 * mm, 125 * mm]))
+    else:
+        # Theoretical candidate or no known strategy: show only what's
+        # real. No mutation, editing method, or success rate rows — those
+        # would render as fabricated-looking "N/A" fields for a case where
+        # they were never meant to exist.
+        summary_rows = [
+            [_p("Evidence Tier", "CellLabel"), _p(recommendation.get("evidence"))],
+            [_p("Associated Gene(s)", "CellLabel"), _p(recommendation.get("gene"))],
+            [
+                _p("Data Source", "CellLabel"),
+                _p(
+                    ", ".join(recommendation["sources"])
+                    if recommendation.get("sources")
+                    else "Project disease-gene library"
+                ),
+            ],
+        ]
+        story.append(_section_table(summary_rows, col_widths=[55 * mm, 125 * mm]))
+        story.append(Spacer(1, 8))
+
+        explanation_text = (
+            recommendation.get("explanation")
+            or recommendation.get("message")
+            or "CRISPR recommendation is currently unavailable for this disease."
+        )
+        story.append(_notice_box(explanation_text))
+
     story.append(Spacer(1, 10))
 
     # -------------------- Inheritance Probability --------------------
@@ -380,14 +446,21 @@ def create_pdf(report):
     story.append(Spacer(1, 10))
 
     # -------------------- AI Reasoning --------------------
-    story.append(Paragraph("AI Reasoning", STYLES["SectionHeading"]))
-    story.append(Paragraph(str(recommendation["ai_reasoning"]), STYLES["BodyJustify"]))
-    story.append(Spacer(1, 10))
+    # Only rendered for validated tiers — for theoretical/no-strategy
+    # results, ai_reasoning duplicates the explanation already shown in
+    # the CRISPR Recommendation section above, and would otherwise print
+    # the literal word "None" for NO_KNOWN_STRATEGY (bug fixed here by
+    # both skipping the section AND using _p() instead of raw str()).
+    if is_validated:
+        story.append(Paragraph("AI Reasoning", STYLES["SectionHeading"]))
+        story.append(Paragraph(_p(recommendation.get("ai_reasoning")).text, STYLES["BodyJustify"]))
+        story.append(Spacer(1, 10))
 
     # -------------------- Reference --------------------
-    story.append(Paragraph("Reference", STYLES["SectionHeading"]))
-    story.append(Paragraph(str(recommendation["reference"]), STYLES["CellText"]))
-    story.append(Spacer(1, 6))
+    if is_validated:
+        story.append(Paragraph("Reference", STYLES["SectionHeading"]))
+        story.append(_p(recommendation.get("reference"), "CellText"))
+        story.append(Spacer(1, 6))
 
     # -------------------- Disclaimer --------------------
     story.append(HRFlowable(width="100%", thickness=0.5, color=BORDER_GREY, spaceBefore=8, spaceAfter=6))

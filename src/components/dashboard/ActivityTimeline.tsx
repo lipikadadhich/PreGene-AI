@@ -1,18 +1,24 @@
-import { Upload, FlaskConical, Download, CheckCircle2 } from "lucide-react";
+import {
+  Upload,
+  FlaskConical,
+  Download,
+  CheckCircle2,
+  AlertCircle,
+  FileText,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ActivityItem, ActivityType } from "@/types";
 
-const activityConfig: Record<
-  ActivityType,
-  { icon: typeof Upload; className: string }
-> = {
+const activityConfig: Record<ActivityType, { icon: typeof Upload; className: string }> = {
   upload: { icon: Upload, className: "bg-blue-50 text-blue-600" },
   analysis_started: { icon: FlaskConical, className: "bg-blue-50 text-blue-600" },
   report_downloaded: { icon: Download, className: "bg-amber-50 text-amber-600" },
-  prediction_completed: {
-    icon: CheckCircle2,
-    className: "bg-emerald-50 text-emerald-600",
-  },
+  prediction_completed: { icon: CheckCircle2, className: "bg-emerald-50 text-emerald-600" },
+  dna_uploaded: { icon: Upload, className: "bg-blue-50 text-blue-600" },
+  dna_upload_failed: { icon: AlertCircle, className: "bg-red-50 text-red-600" },
+  analysis_completed: { icon: CheckCircle2, className: "bg-emerald-50 text-emerald-600" },
+  analysis_failed: { icon: AlertCircle, className: "bg-red-50 text-red-600" },
+  report_generated: { icon: FileText, className: "bg-teal-50 text-teal-600" },
 };
 
 function formatTimestamp(timestamp: string): string {

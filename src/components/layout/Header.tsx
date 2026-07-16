@@ -4,23 +4,26 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Dna, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NAV_LINKS } from "@/data/content";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const goTo = (path: string) => {
     setIsMenuOpen(false);
     navigate(path);
   };
 
+  function handleGetStarted() {
+    goTo(isAuthenticated ? "/dashboard" : "/signup");
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
       <div className="container flex h-20 items-center justify-between">
-        <a
-          href="#top"
-          className="flex items-center gap-2.5 text-lg font-bold text-slate-900"
-        >
+        <a href="#top" className="flex items-center gap-2.5 text-lg font-bold text-slate-900">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
             <Dna className="h-5 w-5" strokeWidth={2.25} aria-hidden="true" />
           </span>
@@ -29,11 +32,7 @@ export default function Header() {
 
         <nav className="hidden items-center gap-9 md:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-[15px] font-medium text-slate-600 transition-colors hover:text-slate-900"
-            >
+            <a key={link.href} href={link.href} className="text-[15px] font-medium text-slate-600 transition-colors hover:text-slate-900">
               {link.label}
             </a>
           ))}
@@ -43,7 +42,7 @@ export default function Header() {
           <Button variant="ghost" size="sm" onClick={() => goTo("/login")}>
             Sign In
           </Button>
-          <Button size="sm" onClick={() => goTo("/disease-prediction")}>
+          <Button size="sm" onClick={handleGetStarted}>
             Get Started
           </Button>
         </div>
@@ -70,17 +69,9 @@ export default function Header() {
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className="overflow-hidden border-t border-slate-200 md:hidden"
           >
-            <nav
-              className="container flex flex-col gap-1 py-4"
-              aria-label="Mobile primary"
-            >
+            <nav className="container flex flex-col gap-1 py-4" aria-label="Mobile primary">
               {NAV_LINKS.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMenuOpen(false)}
-                  className="rounded-lg px-3 py-2.5 text-[15px] font-medium text-slate-700 hover:bg-slate-50"
-                >
+                <a key={link.href} href={link.href} onClick={() => setIsMenuOpen(false)} className="rounded-lg px-3 py-2.5 text-[15px] font-medium text-slate-700 hover:bg-slate-50">
                   {link.label}
                 </a>
               ))}
@@ -88,7 +79,7 @@ export default function Header() {
                 <Button variant="outline" size="sm" className="w-full" onClick={() => goTo("/login")}>
                   Sign In
                 </Button>
-                <Button size="sm" className="w-full" onClick={() => goTo("/disease-prediction")}>
+                <Button size="sm" className="w-full" onClick={handleGetStarted}>
                   Get Started
                 </Button>
               </div>

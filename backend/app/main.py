@@ -1,6 +1,12 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import prediction_router, report_router, history_router, upload_router
+from app.routes import (
+    prediction_router,
+    report_router,
+    history_router,
+    upload_router,
+    notification_router,
+)
 from app.services.dataset_service import dataset_service
 
 app = FastAPI(
@@ -117,8 +123,10 @@ print("Prediction:", type(prediction_router))
 print("Report:", type(report_router))
 print("History:", type(history_router))
 print("Upload:", type(upload_router))
+print("Notification:", type(notification_router))
 
 app.include_router(prediction_router)
 app.include_router(report_router)
 app.include_router(history_router)
 app.include_router(upload_router)
+app.include_router(notification_router)

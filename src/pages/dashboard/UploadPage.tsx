@@ -6,6 +6,7 @@ import {
   AlertCircle,
   CheckCircle2,
   AlertTriangle,
+  Info,
 } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -202,6 +203,21 @@ export default function UploadPage() {
                 <span>Ready for analysis.</span>
               </div>
             )}
+
+            <div className="flex gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-600">
+              <Info className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              <p className="text-sm">
+                This file has been securely stored and validated. Automated
+                genomic interpretation — extracting genotype and mutation
+                data directly from uploaded files — is planned for a future
+                release using a dedicated bioinformatics pipeline. For now,
+                use{" "}
+                <a href="/analysis" className="font-medium text-brand-600 hover:underline">
+                  AI Risk Assessment
+                </a>{" "}
+                to run an analysis with manually entered patient details.
+              </p>
+            </div>
 
             <Button size="sm" onClick={handleUploadAnother}>
               Upload Another File

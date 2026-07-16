@@ -1,5 +1,6 @@
-import { Bell, Search, ChevronDown, Menu, Moon, Sun } from "lucide-react";
+import { Search, ChevronDown, Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import NotificationDropdown from "@/components/common/NotificationDropdown";
 
 interface TopbarProps {
   onMenuClick?: () => void;
@@ -44,14 +45,7 @@ export default function Topbar({ onMenuClick }: TopbarProps) {
           )}
         </button>
 
-        <button
-          type="button"
-          className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-700 hover:bg-ink-900/[0.03]"
-          aria-label="Notifications"
-        >
-          <Bell className="h-5 w-5" />
-          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-brand-500" />
-        </button>
+        <NotificationDropdown />
 
         <button
           type="button"

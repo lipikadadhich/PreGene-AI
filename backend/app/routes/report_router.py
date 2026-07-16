@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse
 from pathlib import Path
 
 from app.services import history_service
+from app.services import notification_service
 
 router = APIRouter(prefix="/report", tags=["Report"])
 
@@ -20,6 +21,13 @@ def download_report():
 
     if not pdf_path.exists():
         return {"error": "Report not found"}
+
+    notification_service.create_notification(
+        type="report_downloaded",
+        title="Report downloaded",
+        message="The latest clinical report was downloaded.",
+        link="/reports",
+    )
 
     return FileResponse(
         path=str(pdf_path),
@@ -68,6 +76,13 @@ def download_report_by_id(report_id: str):
             status_code=404,
             detail="Report record exists but its PDF file is missing.",
         )
+
+    notification_service.create_notification(
+        type="report_downloaded",
+        title="Report downloaded",
+        message=f"The report for {record.get('disease', 'a patient')} was downloaded.",
+        link="/reports",
+    )
 
     return FileResponse(
         path=str(pdf_path),

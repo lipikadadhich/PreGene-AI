@@ -1,0 +1,29 @@
+[
+  {
+    "id": "e05f2568-4af6-41a4-91f1-feb16713fc17",
+    "type": "report_downloaded",
+    "title": "Report downloaded",
+    "message": "The report for Glycogen storage disease due to muscle glycogen phosphorylase deficiency was downloaded.",
+    "link": "/reports",
+    "is_read": true,
+    "created_at": "2026-07-15T07:40:55.826194+00:00"
+  },
+  {
+    "id": "4909861d-0d56-4f07-a385-3cd1a8a343e5",
+    "type": "dna_uploaded",
+    "title": "DNA file uploaded",
+    "message": "'sample_valid.vcf' was uploaded and validated successfully.",
+    "link": "/upload",
+    "is_read": true,
+    "created_at": "2026-07-15T02:21:35.360051+00:00"
+  },
+  {
+    "id": "2fe1a0b6-91cf-480d-8d60-fc802305abec",
+    "type": "dna_upload_failed",
+    "title": "DNA upload failed",
+    "message": "'sample_empty.fasta' failed validation: File is empty",
+    "link": "/upload",
+    "is_read": true,
+    "created_at": "2026-07-15T02:21:25.947015+00:00"
+  }
+]

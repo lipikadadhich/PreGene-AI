@@ -146,43 +146,42 @@ export const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
+// Every link below points to a route or in-page anchor that genuinely
+// exists — no "#" placeholders. Careers/Blog/API/Validation Studies/Case
+// Reports/Partners/Ethics were removed rather than left as dead links,
+// since no real destination exists for them in V1.
 export const FOOTER_COLUMNS: FooterLinkColumn[] = [
   {
     heading: "Platform",
     links: [
       { label: "Features", href: "#features" },
-      { label: "AI Analysis", href: "#" },
-      { label: "CRISPR Engine", href: "#" },
-      { label: "Reports", href: "#" },
-      { label: "API", href: "#" },
+      { label: "AI Analysis", href: "/analysis" },
+      { label: "CRISPR Engine", href: "/crispr-recommendations" },
+      { label: "Reports", href: "/reports" },
     ],
   },
   {
     heading: "Clinical",
     links: [
-      { label: "Research", href: "#research" },
-      { label: "Validation Studies", href: "#" },
-      { label: "Case Reports", href: "#" },
-      { label: "Partners", href: "#" },
-      { label: "Ethics", href: "#" },
+      { label: "Research", href: "/research" },
     ],
   },
   {
     heading: "Company",
     links: [
       { label: "About", href: "#about" },
-      { label: "Blog", href: "#" },
-      { label: "Careers", href: "#" },
       { label: "Contact", href: "#contact" },
-      { label: "Privacy", href: "#" },
+      { label: "Privacy", href: "/privacy" },
     ],
   },
 ];
 
+// HIPAA Compliance intentionally omitted — claiming real regulatory
+// compliance without an actual compliance page/process would itself be
+// a form of fabrication, not just a placeholder link.
 export const FOOTER_LEGAL_LINKS: NavLink[] = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Use", href: "#" },
-  { label: "HIPAA Compliance", href: "#" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Use", href: "/terms" },
 ];
 
 export const FOOTER_DISCLAIMER =

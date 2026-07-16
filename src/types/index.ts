@@ -120,11 +120,21 @@ export interface ResearchArticle {
   url: string;
 }
 
+// Extended to cover every real notification type the backend can emit
+// (see backend/app/schemas/notification_schema.py NOTIFICATION_TYPES),
+// so DashboardPage.tsx can map real notifications directly into
+// ActivityItem[] without lossy re-labeling. The original 4 values are
+// kept for backward compatibility with anything still using them.
 export type ActivityType =
   | "upload"
   | "analysis_started"
   | "report_downloaded"
-  | "prediction_completed";
+  | "prediction_completed"
+  | "dna_uploaded"
+  | "dna_upload_failed"
+  | "analysis_completed"
+  | "analysis_failed"
+  | "report_generated";
 
 export interface ActivityItem {
   id: string;
