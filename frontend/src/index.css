@@ -15,9 +15,9 @@
      most components use hardcoded Tailwind color classes (bg-white,
      text-slate-900, etc.) rather than these semantic tokens. */
   .dark {
-    --background: 222 47% 8%;
+    --background: 222 47% 5%;
     --foreground: 210 20% 96%;
-    --border: 217 33% 20%;
+    --border: 217 33% 17%;
   }
 
   * {
@@ -75,86 +75,123 @@
 /* ---------------------------------------------------------------------- */
 
 @layer utilities {
-  /* ---- Surfaces (backgrounds) ---- */
-  .dark .bg-white { background-color: #0f172a !important; }
-  .dark .bg-white\/80 { background-color: rgb(15 23 42 / 0.8) !important; }
-  .dark .bg-slate-50 { background-color: #111c2e !important; }
-  .dark .bg-slate-100 { background-color: #1a2536 !important; }
-  .dark .bg-slate-100\/40 { background-color: rgb(26 37 54 / 0.4) !important; }
-  .dark .bg-muted { background-color: #1a2536 !important; }
+  /* ---- Surfaces (backgrounds) ----
+     Deep near-black navy, not flat dark gray — this is the single
+     biggest lever for reading as premium clinical software rather than
+     "inverted colors." */
+  .dark .bg-white { background-color: #0b101c !important; }
+  .dark .bg-white\/80 { background-color: rgb(9 13 22 / 0.85) !important; }
+  .dark .bg-slate-50 { background-color: #10161f !important; }
+  .dark .bg-slate-100 { background-color: #161d29 !important; }
+  .dark .bg-slate-100\/40 { background-color: rgb(22 29 41 / 0.4) !important; }
+  .dark .bg-muted { background-color: #131a26 !important; }
+
+  /* ---- Card / panel glow ----
+     Every "bg-white" surface here is a card. Give them a faint border +
+     soft ambient shadow so they read as calm glassy panels rather than
+     solid blocks — the detail that reads as "designed," not just
+     "inverted." */
+  .dark .bg-white,
+  .dark .bg-white\/80 {
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
+      0 8px 24px -8px rgba(0, 0, 0, 0.5);
+  }
 
   /* ---- Text colors ---- */
-  .dark .text-slate-900 { color: #f1f5f9 !important; }
+  .dark .text-slate-900 { color: #f4f7fa !important; }
   .dark .text-slate-700 { color: #cbd5e1 !important; }
   .dark .text-slate-600 { color: #94a3b8 !important; }
-  .dark .text-slate-500 { color: #94a3b8 !important; }
+  .dark .text-slate-500 { color: #8896a8 !important; }
   .dark .text-slate-400 { color: #64748b !important; }
-  .dark .text-ink-900 { color: #f1f5f9 !important; }
+  .dark .text-ink-900 { color: #f4f7fa !important; }
   .dark .text-ink-700 { color: #cbd5e1 !important; }
-  .dark .text-ink-500 { color: #94a3b8 !important; }
+  .dark .text-ink-500 { color: #8896a8 !important; }
   .dark .text-ink-400 { color: #64748b !important; }
-  .dark .text-ink-300 { color: #475569 !important; }
-  .dark .placeholder\:text-ink-300::placeholder { color: #475569 !important; }
+  .dark .text-ink-300 { color: #47536a !important; }
+  .dark .placeholder\:text-ink-300::placeholder { color: #47536a !important; }
 
-  /* ---- Borders ---- */
-  .dark .border-slate-200 { border-color: #1e293b !important; }
-  .dark .border-slate-100 { border-color: #1a2536 !important; }
-  .dark .border-ink-900\/10 { border-color: rgb(30 41 59 / 0.8) !important; }
-  .dark .border-ink-900\/\[0\.06\] { border-color: rgb(30 41 59 / 0.8) !important; }
-  .dark .border-ink-900\/\[0\.05\] { border-color: rgb(30 41 59 / 0.6) !important; }
-  .dark .divide-ink-900\/\[0\.05\] > :not([hidden]) ~ :not([hidden]) { border-color: rgb(30 41 59 / 0.6) !important; }
+  /* ---- Borders — kept faint and quiet, not harsh solid lines ---- */
+  .dark .border-slate-200 { border-color: rgba(148, 163, 184, 0.12) !important; }
+  .dark .border-slate-100 { border-color: rgba(148, 163, 184, 0.08) !important; }
+  .dark .border-ink-900\/10 { border-color: rgba(148, 163, 184, 0.12) !important; }
+  .dark .border-ink-900\/\[0\.06\] { border-color: rgba(148, 163, 184, 0.1) !important; }
+  .dark .border-ink-900\/\[0\.05\] { border-color: rgba(148, 163, 184, 0.08) !important; }
+  .dark .divide-ink-900\/\[0\.05\] > :not([hidden]) ~ :not([hidden]) { border-color: rgba(148, 163, 184, 0.08) !important; }
 
   /* ---- Native form elements (input, select, textarea) ----
      These don't carry an explicit bg-white class in most forms — they
      just get the browser's own default white background, which no
-     Tailwind class override can catch. Needs a direct element rule. */
+     Tailwind class override can catch. Needs a direct element rule.
+     Slightly lighter than the page background so fields read as
+     "inset," a common clinical-software input treatment. Focus state
+     uses a soft brand-color glow instead of a harsh blue ring. */
   .dark input,
   .dark select,
   .dark textarea {
-    background-color: #0f172a !important;
-    color: #f1f5f9 !important;
-    border-color: #1e293b !important;
+    background-color: #10161f !important;
+    color: #f4f7fa !important;
+    border-color: rgba(148, 163, 184, 0.14) !important;
+  }
+  .dark input:focus,
+  .dark select:focus,
+  .dark textarea:focus {
+    border-color: rgba(30, 152, 115, 0.6) !important;
+    box-shadow: 0 0 0 3px rgba(30, 152, 115, 0.15) !important;
   }
   .dark input::placeholder,
   .dark textarea::placeholder {
-    color: #64748b !important;
+    color: #4b5768 !important;
   }
   .dark select option {
-    background-color: #0f172a !important;
-    color: #f1f5f9 !important;
+    background-color: #10161f !important;
+    color: #f4f7fa !important;
   }
 
   /* ---- Hover states on dark surfaces ---- */
-  .dark .hover\:bg-slate-50:hover { background-color: #1a2536 !important; }
-  .dark .hover\:bg-ink-900\/\[0\.02\]:hover { background-color: rgb(255 255 255 / 0.03) !important; }
-  .dark .hover\:bg-ink-900\/\[0\.03\]:hover { background-color: rgb(255 255 255 / 0.05) !important; }
-  .dark .hover\:bg-ink-900\/\[0\.05\]:hover { background-color: rgb(255 255 255 / 0.07) !important; }
+  .dark .hover\:bg-slate-50:hover { background-color: #161d29 !important; }
+  .dark .hover\:bg-ink-900\/\[0\.02\]:hover { background-color: rgba(255, 255, 255, 0.03) !important; }
+  .dark .hover\:bg-ink-900\/\[0\.03\]:hover { background-color: rgba(255, 255, 255, 0.05) !important; }
+  .dark .hover\:bg-ink-900\/\[0\.05\]:hover { background-color: rgba(255, 255, 255, 0.07) !important; }
 
   /* ---- Status/tint backgrounds (badges, icon chips, callouts) ----
      Kept close to original hue, just darkened, so meaning (success/
-     warning/error) is still instantly recognizable in dark mode. */
-  .dark .bg-brand-50 { background-color: rgb(15 122 92 / 0.15) !important; }
-  .dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.15) !important; }
-  .dark .bg-emerald-50\/40 { background-color: rgb(16 185 129 / 0.08) !important; }
-  .dark .bg-amber-50 { background-color: rgb(245 158 11 / 0.15) !important; }
-  .dark .bg-rose-50 { background-color: rgb(244 63 94 / 0.15) !important; }
-  .dark .bg-sky-50 { background-color: rgb(14 165 233 / 0.15) !important; }
-  .dark .bg-red-50 { background-color: rgb(239 68 68 / 0.15) !important; }
+     warning/error) is still instantly recognizable. The brand (primary)
+     tint gets a soft outer glow — used sparingly on key icon chips
+     only, not splashed everywhere, so it reads as a deliberate accent
+     rather than neon-everywhere. */
+  .dark .bg-brand-50 {
+    background-color: rgba(30, 152, 115, 0.14) !important;
+    box-shadow: 0 0 24px -6px rgba(30, 152, 115, 0.35);
+  }
+  .dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.14) !important; }
+  .dark .bg-emerald-50\/40 { background-color: rgba(16, 185, 129, 0.08) !important; }
+  .dark .bg-amber-50 { background-color: rgba(245, 158, 11, 0.14) !important; }
+  .dark .bg-rose-50 { background-color: rgba(244, 63, 94, 0.14) !important; }
+  .dark .bg-sky-50 { background-color: rgba(14, 165, 233, 0.14) !important; }
+  .dark .bg-red-50 { background-color: rgba(239, 68, 68, 0.14) !important; }
+  .dark .border-red-200 { border-color: rgba(239, 68, 68, 0.35) !important; }
 
   /* ---- Text on tinted backgrounds — brighten for contrast ---- */
-  .dark .text-brand-600, .dark .text-brand-700 { color: #3ab68e !important; }
+  .dark .text-brand-600, .dark .text-brand-700 { color: #4ecfa4 !important; }
   .dark .text-emerald-600, .dark .text-emerald-700 { color: #34d399 !important; }
   .dark .text-amber-600, .dark .text-amber-700 { color: #fbbf24 !important; }
   .dark .text-rose-600, .dark .text-rose-700 { color: #fb7185 !important; }
   .dark .text-sky-600 { color: #38bdf8 !important; }
   .dark .text-red-600 { color: #f87171 !important; }
 
-  /* ---- Skeleton / placeholder / disabled elements ---- */
-  .dark .bg-ink-200 { background-color: #334155 !important; }
-  .dark .text-ink-200 { color: #334155 !important; }
+  /* ---- Primary buttons get a subtle brand glow — the one place a
+     little extra polish reads as intentional rather than excessive ---- */
+  .dark .bg-brand-500 {
+    box-shadow: 0 0 20px -4px rgba(30, 152, 115, 0.5);
+  }
 
-  /* ---- Shadows read poorly on dark backgrounds — soften them ---- */
-  .dark .shadow-sm, .dark .shadow-lg, .dark .shadow-xl {
-    box-shadow: 0 4px 16px -4px rgb(0 0 0 / 0.4) !important;
+  /* ---- Skeleton / placeholder / disabled elements ---- */
+  .dark .bg-ink-200 { background-color: #2a3441 !important; }
+  .dark .text-ink-200 { color: #2a3441 !important; }
+
+  /* ---- Shadows — softened ambient glow instead of harsh black ---- */
+  .dark .shadow-sm, .dark .shadow-lg, .dark .shadow-xl, .dark .shadow-card, .dark .shadow-float {
+    box-shadow: 0 8px 28px -8px rgba(0, 0, 0, 0.55) !important;
   }
 }
