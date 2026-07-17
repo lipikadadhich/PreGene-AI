@@ -45,7 +45,9 @@ app.add_middleware(
         "http://localhost:5178",
         # Production frontend (Vercel)
         "https://pre-gene-ai-qq21.vercel.app",
+        "https://pre-gene-ai.vercel.app",
     ],
+
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
