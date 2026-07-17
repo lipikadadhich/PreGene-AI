@@ -43,9 +43,8 @@ app.add_middleware(
         "http://localhost:5176",
         "http://localhost:5177",
         "http://localhost:5178",
-        # TODO: replace with your actual deployed Vercel URL, e.g.
-        # "https://pregene-ai.vercel.app"
-        "https://REPLACE-WITH-YOUR-VERCEL-URL.vercel.app",
+        # Production frontend (Vercel)
+        "https://pre-gene-ai-qq21.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
