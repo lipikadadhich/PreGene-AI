@@ -9,6 +9,17 @@
     --border: 220 20% 91%;
   }
 
+  /* FIX: dark mode variables were never defined — the .dark class was
+     correctly toggled by ThemeContext, but nothing changed visually
+     because there was no .dark override for these CSS variables, and
+     most components use hardcoded Tailwind color classes (bg-white,
+     text-slate-900, etc.) rather than these semantic tokens. */
+  .dark {
+    --background: 222 47% 8%;
+    --foreground: 210 20% 96%;
+    --border: 217 33% 20%;
+  }
+
   * {
     @apply border-border;
   }
@@ -39,5 +50,87 @@
     outline: 2px solid #2563eb;
     outline-offset: 2px;
     border-radius: 4px;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* GLOBAL DARK MODE OVERRIDES                                              */
+/*                                                                          */
+/* Most components use hardcoded Tailwind utility classes (bg-white,       */
+/* text-slate-900, border-slate-200, etc.) rather than the semantic        */
+/* background/foreground/border tokens above. Tailwind only generates      */
+/* dark: variants for classes actually written in source files, and none   */
+/* exist yet — so retrofitting ~70 component files individually would be  */
+/* required for the dark: variant approach to work.                        */
+/*                                                                          */
+/* Instead, these are plain CSS rules that directly restyle the existing   */
+/* utility classes whenever an ancestor has the .dark class (which         */
+/* ThemeContext already correctly applies to <html>). This gives working,  */
+/* app-wide dark mode immediately, without editing every component.        */
+/*                                                                          */
+/* This covers the color classes actually seen in this app's components    */
+/* tonight (RiskAssessmentPanel, NotificationDropdown, DiseaseAutocomplete, */
+/* etc.) plus the standard Tailwind slate/emerald/amber/rose/sky scale      */
+/* used for surfaces, text, borders, and status colors throughout.         */
+/* ---------------------------------------------------------------------- */
+
+@layer utilities {
+  /* ---- Surfaces (backgrounds) ---- */
+  .dark .bg-white { background-color: #0f172a !important; }
+  .dark .bg-slate-50 { background-color: #111c2e !important; }
+  .dark .bg-slate-100 { background-color: #1a2536 !important; }
+  .dark .bg-slate-100\/40 { background-color: rgb(26 37 54 / 0.4) !important; }
+
+  /* ---- Text colors ---- */
+  .dark .text-slate-900 { color: #f1f5f9 !important; }
+  .dark .text-slate-700 { color: #cbd5e1 !important; }
+  .dark .text-slate-600 { color: #94a3b8 !important; }
+  .dark .text-slate-500 { color: #94a3b8 !important; }
+  .dark .text-slate-400 { color: #64748b !important; }
+  .dark .text-ink-900 { color: #f1f5f9 !important; }
+  .dark .text-ink-700 { color: #cbd5e1 !important; }
+  .dark .text-ink-500 { color: #94a3b8 !important; }
+  .dark .text-ink-400 { color: #64748b !important; }
+  .dark .text-ink-300 { color: #475569 !important; }
+
+  /* ---- Borders ---- */
+  .dark .border-slate-200 { border-color: #1e293b !important; }
+  .dark .border-slate-100 { border-color: #1a2536 !important; }
+  .dark .border-ink-900\/\[0\.06\] { border-color: rgb(30 41 59 / 0.8) !important; }
+  .dark .border-ink-900\/\[0\.05\] { border-color: rgb(30 41 59 / 0.6) !important; }
+  .dark .divide-ink-900\/\[0\.05\] > :not([hidden]) ~ :not([hidden]) { border-color: rgb(30 41 59 / 0.6) !important; }
+
+  /* ---- Hover states on dark surfaces ---- */
+  .dark .hover\:bg-slate-50:hover { background-color: #1a2536 !important; }
+  .dark .hover\:bg-ink-900\/\[0\.02\]:hover { background-color: rgb(255 255 255 / 0.03) !important; }
+  .dark .hover\:bg-ink-900\/\[0\.03\]:hover { background-color: rgb(255 255 255 / 0.05) !important; }
+  .dark .hover\:bg-ink-900\/\[0\.05\]:hover { background-color: rgb(255 255 255 / 0.07) !important; }
+
+  /* ---- Status/tint backgrounds (badges, icon chips, callouts) ----
+     Kept close to original hue, just darkened, so meaning (success/
+     warning/error) is still instantly recognizable in dark mode. */
+  .dark .bg-brand-50 { background-color: rgb(15 122 92 / 0.15) !important; }
+  .dark .bg-emerald-50 { background-color: rgb(16 185 129 / 0.15) !important; }
+  .dark .bg-emerald-50\/40 { background-color: rgb(16 185 129 / 0.08) !important; }
+  .dark .bg-amber-50 { background-color: rgb(245 158 11 / 0.15) !important; }
+  .dark .bg-rose-50 { background-color: rgb(244 63 94 / 0.15) !important; }
+  .dark .bg-sky-50 { background-color: rgb(14 165 233 / 0.15) !important; }
+  .dark .bg-red-50 { background-color: rgb(239 68 68 / 0.15) !important; }
+
+  /* ---- Text on tinted backgrounds — brighten for contrast ---- */
+  .dark .text-brand-600, .dark .text-brand-700 { color: #3ab68e !important; }
+  .dark .text-emerald-600, .dark .text-emerald-700 { color: #34d399 !important; }
+  .dark .text-amber-600, .dark .text-amber-700 { color: #fbbf24 !important; }
+  .dark .text-rose-600, .dark .text-rose-700 { color: #fb7185 !important; }
+  .dark .text-sky-600 { color: #38bdf8 !important; }
+  .dark .text-red-600 { color: #f87171 !important; }
+
+  /* ---- Skeleton / placeholder / disabled elements ---- */
+  .dark .bg-ink-200 { background-color: #334155 !important; }
+  .dark .text-ink-200 { color: #334155 !important; }
+
+  /* ---- Shadows read poorly on dark backgrounds — soften them ---- */
+  .dark .shadow-sm, .dark .shadow-lg, .dark .shadow-xl {
+    box-shadow: 0 4px 16px -4px rgb(0 0 0 / 0.4) !important;
   }
 }
