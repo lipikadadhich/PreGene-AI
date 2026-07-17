@@ -77,9 +77,11 @@
 @layer utilities {
   /* ---- Surfaces (backgrounds) ---- */
   .dark .bg-white { background-color: #0f172a !important; }
+  .dark .bg-white\/80 { background-color: rgb(15 23 42 / 0.8) !important; }
   .dark .bg-slate-50 { background-color: #111c2e !important; }
   .dark .bg-slate-100 { background-color: #1a2536 !important; }
   .dark .bg-slate-100\/40 { background-color: rgb(26 37 54 / 0.4) !important; }
+  .dark .bg-muted { background-color: #1a2536 !important; }
 
   /* ---- Text colors ---- */
   .dark .text-slate-900 { color: #f1f5f9 !important; }
@@ -92,13 +94,35 @@
   .dark .text-ink-500 { color: #94a3b8 !important; }
   .dark .text-ink-400 { color: #64748b !important; }
   .dark .text-ink-300 { color: #475569 !important; }
+  .dark .placeholder\:text-ink-300::placeholder { color: #475569 !important; }
 
   /* ---- Borders ---- */
   .dark .border-slate-200 { border-color: #1e293b !important; }
   .dark .border-slate-100 { border-color: #1a2536 !important; }
+  .dark .border-ink-900\/10 { border-color: rgb(30 41 59 / 0.8) !important; }
   .dark .border-ink-900\/\[0\.06\] { border-color: rgb(30 41 59 / 0.8) !important; }
   .dark .border-ink-900\/\[0\.05\] { border-color: rgb(30 41 59 / 0.6) !important; }
   .dark .divide-ink-900\/\[0\.05\] > :not([hidden]) ~ :not([hidden]) { border-color: rgb(30 41 59 / 0.6) !important; }
+
+  /* ---- Native form elements (input, select, textarea) ----
+     These don't carry an explicit bg-white class in most forms — they
+     just get the browser's own default white background, which no
+     Tailwind class override can catch. Needs a direct element rule. */
+  .dark input,
+  .dark select,
+  .dark textarea {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+    border-color: #1e293b !important;
+  }
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #64748b !important;
+  }
+  .dark select option {
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+  }
 
   /* ---- Hover states on dark surfaces ---- */
   .dark .hover\:bg-slate-50:hover { background-color: #1a2536 !important; }
