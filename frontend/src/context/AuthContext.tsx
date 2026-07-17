@@ -17,7 +17,7 @@ import {
 // ---------------------------------------------------------------------------
 
 const AUTH_STORAGE_KEY = "pregene_auth_session";
-const BACKEND_URL = "http://127.0.0.1:8000";
+const BACKEND_URL = "https://pregene-ai.onrender.com";
 
 export interface AuthUser {
   name: string;
