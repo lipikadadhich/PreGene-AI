@@ -1,0 +1,5 @@
+{
+  "best_model": "logistic_regression",
+  "n_features": 21,
+  "n_classes": 3
+}
