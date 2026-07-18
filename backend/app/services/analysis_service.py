@@ -76,8 +76,13 @@ def run_analysis_job(job_id: str, data: dict) -> None:
         job_service.complete_stage(job_id, "inheritance")
 
         # --- Stage 3: AI Risk Prediction ------------------------------
+        # FIX: now backed by the real trained model (see
+        # ai/models/risk_predictor.py) instead of hardcoded point-scoring.
+        # `disease` is now passed through too, since it's one of the
+        # features the model was actually trained on.
         job_service.start_stage(job_id, "risk_prediction")
         risk_score, risk_level = predict_risk(
+            data["disease"],
             data["inheritance"],
             data["father_carrier"],
             data["mother_carrier"],
