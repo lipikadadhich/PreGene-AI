@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { SIDEBAR_NAV_ITEMS } from "@/data/content";
 import Sidebar from "@/components/common/Sidebar";
 import Topbar from "@/components/common/Topbar";
+import ChatbotWidget from "@/components/common/ChatbotWidget";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function AppLayout() {
@@ -109,6 +110,11 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Floating clinical assistant chatbot — appears on every dashboard
+          page, not just one, since it's rendered here at the layout level
+          rather than inside a specific page component. */}
+      <ChatbotWidget />
     </div>
   );
 }

@@ -1,5 +1,4 @@
-const API_URL = "https://pregene-ai-1.onrender.com";
-
+export const API_URL = "https://pregene-ai.onrender.com";
 // ==============================
 // Disease Search
 // ==============================

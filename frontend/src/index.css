@@ -100,6 +100,7 @@
 
   /* ---- Text colors ---- */
   .dark .text-slate-900 { color: #f4f7fa !important; }
+  .dark .text-slate-800 { color: #e8edf2 !important; }
   .dark .text-slate-700 { color: #cbd5e1 !important; }
   .dark .text-slate-600 { color: #94a3b8 !important; }
   .dark .text-slate-500 { color: #8896a8 !important; }
