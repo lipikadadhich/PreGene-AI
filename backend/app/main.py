@@ -13,6 +13,7 @@ from app.routes import (
     notification_router,
 )
 from app.routes.auth_router import auth_router
+from app.routes.chat_router import chat_router
 from app.services.dataset_service import dataset_service
 
 
@@ -213,6 +214,7 @@ print("History:", type(history_router))
 print("Upload:", type(upload_router))
 print("Notification:", type(notification_router))
 print("Auth:", type(auth_router))
+print("Chat:", type(chat_router))
 
 app.include_router(prediction_router)
 app.include_router(report_router)
@@ -220,3 +222,4 @@ app.include_router(history_router)
 app.include_router(upload_router)
 app.include_router(notification_router)
 app.include_router(auth_router)
+app.include_router(chat_router)
