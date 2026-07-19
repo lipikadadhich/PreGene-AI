@@ -94,33 +94,58 @@ def retrieve(question: str, top_k: int = TOP_K):
 
 def answer_question(question: str) -> dict:
     """
-    Full RAG pipeline: retrieve relevant passages, then generate an
-    answer grounded in them. Returns the answer plus the sources used,
-    so the frontend can show "this answer was based on: ..." for
-    transparency.
+    Hybrid RAG pipeline: retrieves relevant passages and grounds the
+    answer in them when they're genuinely relevant, but also lets the
+    model use its own general medical/genetics knowledge to answer
+    naturally — the way a real conversational assistant would, rather
+    than refusing anything not explicitly in the knowledge base.
     """
     retrieved = retrieve(question)
 
-    if not retrieved:
-        return {
-            "answer": "I couldn't find anything relevant in the knowledge base to answer that.",
-            "sources": [],
-        }
+    # Only include retrieved passages as grounding if they're actually
+    # relevant to the question (similarity above a reasonable threshold).
+    # Below this, the retrieved passages are likely noise (the FAISS
+    # search always returns *something*, even for unrelated questions),
+    # so we let the model answer from general knowledge instead of
+    # force-feeding it irrelevant context.
+    RELEVANCE_THRESHOLD = 0.35
+    relevant = [r for r in retrieved if r["similarity"] >= RELEVANCE_THRESHOLD]
 
-    context = "\n\n".join(
-        f"[{i+1}] {r['passage']}" for i, r in enumerate(retrieved)
-    )
-
-    system_prompt = (
-        "You are a clinical genetics assistant for PreGene-AI. Answer the "
-        "user's question using ONLY the numbered context passages provided "
-        "below. If the context doesn't contain enough information to "
-        "answer confidently, say so clearly rather than guessing. Keep "
-        "answers concise and clinically appropriate. Cite which numbered "
-        "passage(s) you used, like [1] or [2][3]."
-    )
-
-    user_prompt = f"Context:\n{context}\n\nQuestion: {question}"
+    if relevant:
+        context = "\n\n".join(
+            f"[{i+1}] {r['passage']}" for i, r in enumerate(relevant)
+        )
+        system_prompt = (
+            "You are the PreGene-AI clinical assistant — a knowledgeable, "
+            "conversational genetics and genomics expert, similar in tone "
+            "to a helpful AI assistant like ChatGPT. You can answer both "
+            "specific questions using the reference passages below AND "
+            "general questions using your own broad medical/genetics "
+            "knowledge, the same way a real expert would draw on both a "
+            "specific patient chart and their general training.\n\n"
+            "When the reference passages below are relevant to the "
+            "question, use them and cite which one(s) you used, like [1] "
+            "or [2][3] — this keeps your clinical claims grounded and "
+            "verifiable. For background, definitional, or general "
+            "questions (e.g. 'what is X condition', 'how does Y work'), "
+            "answer naturally and conversationally using your own "
+            "knowledge, without forcing a citation if the passages don't "
+            "directly cover it. Keep answers clear, warm, and "
+            "appropriately concise — a paragraph or two unless more "
+            "detail is clearly wanted."
+        )
+        user_prompt = f"Reference passages:\n{context}\n\nQuestion: {question}"
+    else:
+        # No sufficiently relevant passages retrieved — answer as a
+        # general knowledgeable assistant instead of saying "I don't know."
+        system_prompt = (
+            "You are the PreGene-AI clinical assistant — a knowledgeable, "
+            "conversational genetics and genomics expert, similar in tone "
+            "to a helpful AI assistant like ChatGPT. Answer the user's "
+            "question using your own broad medical/genetics knowledge. "
+            "Keep answers clear, warm, and appropriately concise."
+        )
+        user_prompt = question
 
     client = _get_groq_client()
     response = client.chat.completions.create(
@@ -129,8 +154,8 @@ def answer_question(question: str) -> dict:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.2,  # low temperature — this is clinical info, not creative writing
-        max_tokens=500,
+        temperature=0.4,  # slightly higher than pure-retrieval mode — allows more natural phrasing while staying factual
+        max_tokens=600,
     )
 
     answer = response.choices[0].message.content
@@ -143,6 +168,6 @@ def answer_question(question: str) -> dict:
                 "source": r["source"],
                 "similarity": round(r["similarity"], 3),
             }
-            for r in retrieved
+            for r in relevant
         ],
     }
