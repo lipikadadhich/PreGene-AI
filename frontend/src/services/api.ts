@@ -354,6 +354,27 @@ export async function getAnalysisHistory(): Promise<AnalysisHistoryRecord[]> {
 // ==============================
 // DNA File Upload
 // ==============================
+
+// Best-effort data extracted from a VCF file by the backend's
+// vcf_parser_service.py, used to pre-fill the AI Risk Assessment form
+// instead of requiring every field to be typed in manually.
+//
+// NOTE: a single VCF represents one individual's genotype, not a
+// father AND a mother — so this deliberately does not claim to be
+// "father_genotype" or "mother_genotype" directly. The UI must ask the
+// user which parent (if any) this sample belongs to before mapping
+// genotype_notation into PatientFormData.
+export interface ExtractedGeneticData {
+  matched: boolean;
+  gene?: string | null;
+  zygosity?: "homozygous_ref" | "heterozygous" | "homozygous_alt" | null;
+  genotype_notation?: string | null; // "AA" | "Aa" | "aa"
+  disease?: string | null;
+  inheritance?: string | null;
+  variants_found: number;
+  note: string;
+}
+
 export interface UploadSuccessResponse {
   file_name: string;
   file_size_bytes: number;
@@ -363,6 +384,7 @@ export interface UploadSuccessResponse {
   sequence_length?: number | null;
   quality_score?: number | null;
   processing_status: string;
+  extracted_data?: ExtractedGeneticData | null;
 }
 
 export interface UploadErrorResponse {
