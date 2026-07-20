@@ -1,6 +1,7 @@
 import {
   Dna,
   Brain,
+  BrainCircuit,
   Scissors,
   ShieldCheck,
   HeartPulse,
@@ -194,6 +195,7 @@ export const SIDEBAR_NAV_ITEMS: SidebarNavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Upload DNA", href: "/upload", icon: Upload },
   { label: "AI Analysis", href: "/analysis", icon: FlaskConical },
+  { label: "Model Insights", href: "/model-insights", icon: BrainCircuit },
   { label: "CRISPR Recommendations", href: "/crispr-recommendations", icon: Scissors },
   { label: "Disease Library", href: "/disease-library", icon: Library },
   { label: "Reports", href: "/reports", icon: BarChart3 },
