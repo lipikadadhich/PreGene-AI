@@ -14,6 +14,7 @@ from app.routes import (
 )
 from app.routes.auth_router import auth_router
 from app.routes.chat_router import chat_router
+from app.routes.ml_insights_router import ml_insights_router
 from app.services.dataset_service import dataset_service
 
 
@@ -215,6 +216,7 @@ print("Upload:", type(upload_router))
 print("Notification:", type(notification_router))
 print("Auth:", type(auth_router))
 print("Chat:", type(chat_router))
+print("ML Insights:", type(ml_insights_router))
 
 app.include_router(prediction_router)
 app.include_router(report_router)
@@ -223,3 +225,4 @@ app.include_router(upload_router)
 app.include_router(notification_router)
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(ml_insights_router)
