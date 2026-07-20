@@ -2,8 +2,13 @@ import shutil
 from pathlib import Path
 from datetime import datetime, timezone
 
-from app.schemas.upload_schema import UploadResponse, UploadErrorResponse
+from app.schemas.upload_schema import (
+    UploadResponse,
+    UploadErrorResponse,
+    ExtractedGeneticData,
+)
 from app.services import notification_service
+from app.services.vcf_parser_service import parse_vcf_for_prediction
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -63,6 +68,30 @@ def _validate_file(file_path: Path, extension: str) -> tuple[str, str | None]:
     return "valid", None
 
 
+def _extract_genetic_data_if_vcf(
+    file_path: Path, extension: str
+) -> ExtractedGeneticData | None:
+    """
+    For valid VCF files, runs the VCF parser to pull out gene/genotype/
+    disease/inheritance info for pre-filling the AI Risk Assessment
+    form. Returns None for every other file type.
+
+    Never raises: vcf_parser_service already guarantees a graceful
+    "no match" dict rather than an exception, but this is wrapped in a
+    try/except anyway so a parser bug can never take down the upload
+    endpoint itself - the file is already safely saved and validated
+    by this point regardless of what happens here.
+    """
+    if extension != ".vcf":
+        return None
+
+    try:
+        parsed = parse_vcf_for_prediction(file_path)
+        return ExtractedGeneticData(**parsed)
+    except Exception:
+        return None
+
+
 def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
     """
     Saves an uploaded file (FastAPI UploadFile) to disk and returns
@@ -117,6 +146,12 @@ def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
     # a real clinical metric.
     quality_score = 95.0 if validation_status == "valid" else 60.0
 
+    # Only attempted for valid VCF files. FASTA/FASTQ/CSV/TXT/ZIP all
+    # return None here, unchanged from before this feature existed.
+    extracted_data = None
+    if validation_status == "valid":
+        extracted_data = _extract_genetic_data_if_vcf(dest_path, extension)
+
     notification_service.create_notification(
         type="dna_uploaded",
         title="DNA file uploaded",
@@ -133,4 +168,5 @@ def save_upload(upload_file) -> UploadResponse | UploadErrorResponse:
         sequence_length=sequence_length,
         quality_score=quality_score,
         processing_status="uploaded",
+        extracted_data=extracted_data,
     )
