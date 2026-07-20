@@ -54,28 +54,38 @@ def _ensure_loaded():
     global _embedding_model, _index, _passages, _sources
 
     if _embedding_model is not None:
-        return  # already loaded, nothing to do
+        return
 
-    print("Loading RAG index and embedding model (lazy, first use)...")
+    print("STEP 1 - Starting _ensure_loaded")
 
-    # Import here, not at module level — sentence_transformers itself
-    # pulls in torch and other heavy dependencies, so delaying the
-    # import delays that memory cost too, not just the model weights.
+    print("STEP 2 - Importing SentenceTransformer")
     from sentence_transformers import SentenceTransformer
+    print("STEP 3 - SentenceTransformer imported")
 
+    print("STEP 4 - Opening config")
     with open(os.path.join(INDEX_DIR, "config.json")) as f:
         config = json.load(f)
+    print("STEP 5 - Config loaded")
 
+    print("STEP 6 - Loading embedding model")
     _embedding_model = SentenceTransformer(config["embedding_model"])
-    _index = faiss.read_index(os.path.join(INDEX_DIR, "knowledge.index"))
+    print("STEP 7 - Embedding model loaded")
 
+    print("STEP 8 - Loading FAISS index")
+    _index = faiss.read_index(os.path.join(INDEX_DIR, "knowledge.index"))
+    print("STEP 9 - FAISS loaded")
+
+    print("STEP 10 - Loading passages")
     with open(os.path.join(INDEX_DIR, "passages.json"), encoding="utf-8") as f:
         _passages = json.load(f)
+    print("STEP 11 - Passages loaded")
 
+    print("STEP 12 - Loading sources")
     with open(os.path.join(INDEX_DIR, "sources.json"), encoding="utf-8") as f:
         _sources = json.load(f)
+    print("STEP 13 - Sources loaded")
 
-    print(f"RAG index loaded: {_index.ntotal} passages ready for retrieval.")
+    print(f"RAG index loaded: {_index.ntotal} passages ready.")
 
 
 def _get_groq_client() -> Groq:
