@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Upload,
   FileCheck2,
@@ -7,6 +8,8 @@ import {
   CheckCircle2,
   AlertTriangle,
   Info,
+  Dna,
+  ArrowRight,
 } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import EmptyState from "@/components/dashboard/EmptyState";
@@ -24,11 +27,20 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+type SampleOwner = "father" | "mother";
+
 export default function UploadPage() {
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [result, setResult] = useState<UploadResult | null>(null);
   const [networkError, setNetworkError] = useState<string | null>(null);
+
+  // Who the detected VCF genotype belongs to. A single VCF only ever
+  // represents one individual, so we ask rather than guess — this
+  // stays null until the user picks one, and the "Continue" button is
+  // disabled until they do.
+  const [sampleOwner, setSampleOwner] = useState<SampleOwner | null>(null);
 
   function handleBrowseClick() {
     fileInputRef.current?.click();
@@ -41,6 +53,7 @@ export default function UploadPage() {
     setIsUploading(true);
     setNetworkError(null);
     setResult(null);
+    setSampleOwner(null);
 
     try {
       const response = await uploadDnaFile(file);
@@ -59,7 +72,36 @@ export default function UploadPage() {
   function handleUploadAnother() {
     setResult(null);
     setNetworkError(null);
+    setSampleOwner(null);
     fileInputRef.current?.click();
+  }
+
+  function handleContinueToAnalysis() {
+    if (!result || isUploadError(result) || !result.extracted_data || !sampleOwner) {
+      return;
+    }
+
+    const { extracted_data } = result;
+
+    const genotypeField =
+      sampleOwner === "father" ? "father_genotype" : "mother_genotype";
+    const carrierField =
+      sampleOwner === "father" ? "father_carrier" : "mother_carrier";
+
+    const isCarrierOrAffected =
+      extracted_data.zygosity === "heterozygous" ||
+      extracted_data.zygosity === "homozygous_alt";
+
+    navigate("/analysis", {
+      state: {
+        prefill: {
+          disease: extracted_data.disease ?? "",
+          inheritance: extracted_data.inheritance ?? undefined,
+          [genotypeField]: extracted_data.genotype_notation ?? undefined,
+          [carrierField]: isCarrierOrAffected,
+        },
+      },
+    });
   }
 
   return (
@@ -204,22 +246,109 @@ export default function UploadPage() {
               </div>
             )}
 
-            <div className="flex gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-600">
-              <Info className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              <p className="text-sm">
-                This file has been securely stored and validated. Automated
-                genomic interpretation — extracting genotype and mutation
-                data directly from uploaded files — is planned for a future
-                release using a dedicated bioinformatics pipeline. For now,
-                use{" "}
-                <a href="/analysis" className="font-medium text-brand-600 hover:underline">
-                  AI Risk Assessment
-                </a>{" "}
-                to run an analysis with manually entered patient details.
-              </p>
-            </div>
+            {result.extracted_data?.matched ? (
+              <div className="space-y-4 rounded-xl border border-brand-200 bg-brand-50/60 p-4">
+                <div className="flex items-start gap-2.5 text-brand-700">
+                  <Dna className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                  <div>
+                    <p className="text-sm font-semibold">
+                      Genetic data detected
+                    </p>
+                    <p className="mt-1 text-sm text-brand-700/90">
+                      {result.extracted_data.note}
+                    </p>
+                  </div>
+                </div>
 
-            <Button size="sm" onClick={handleUploadAnother}>
+                <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  {result.extracted_data.gene && (
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-ink-400">
+                        Gene
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-ink-900">
+                        {result.extracted_data.gene}
+                      </dd>
+                    </div>
+                  )}
+                  {result.extracted_data.genotype_notation && (
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-ink-400">
+                        Genotype
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-ink-900">
+                        {result.extracted_data.genotype_notation}
+                      </dd>
+                    </div>
+                  )}
+                  {result.extracted_data.disease && (
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-ink-400">
+                        Matched Disease
+                      </dt>
+                      <dd className="mt-1 text-sm font-medium text-ink-900">
+                        {result.extracted_data.disease}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+
+                <div>
+                  <p className="mb-2 text-sm font-medium text-ink-900">
+                    Whose sample is this?
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={sampleOwner === "father" ? "primary" : "outline"}
+                      onClick={() => setSampleOwner("father")}
+                    >
+                      Father
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant={sampleOwner === "mother" ? "primary" : "outline"}
+                      onClick={() => setSampleOwner("mother")}
+                    >
+                      Mother
+                    </Button>
+                  </div>
+                  <p className="mt-2 text-xs text-ink-400">
+                    A single DNA file reflects one person's genotype, so
+                    we need to know whose sample this is before
+                    pre-filling the risk assessment form. You can still
+                    edit every field on the next screen.
+                  </p>
+                </div>
+
+                <Button
+                  size="sm"
+                  disabled={!sampleOwner}
+                  onClick={handleContinueToAnalysis}
+                  className="w-full sm:w-auto"
+                >
+                  Continue to AI Risk Assessment
+                  <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-slate-600">
+                <Info className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                <p className="text-sm">
+                  {result.extracted_data?.note ??
+                    "This file has been securely stored and validated."}{" "}
+                  Use{" "}
+                  <a href="/analysis" className="font-medium text-brand-600 hover:underline">
+                    AI Risk Assessment
+                  </a>{" "}
+                  to run an analysis with manually entered patient details.
+                </p>
+              </div>
+            )}
+
+            <Button size="sm" variant="outline" onClick={handleUploadAnother}>
               Upload Another File
             </Button>
           </CardContent>
