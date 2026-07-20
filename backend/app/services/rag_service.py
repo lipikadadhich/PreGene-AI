@@ -22,7 +22,6 @@ import os
 import faiss
 import numpy as np
 from groq import Groq
-from sentence_transformers import SentenceTransformer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 INDEX_DIR = os.path.join(BASE_DIR, "ml", "rag_index")
@@ -30,25 +29,53 @@ INDEX_DIR = os.path.join(BASE_DIR, "ml", "rag_index")
 TOP_K = 4  # how many passages to retrieve per question
 GROQ_MODEL = "llama-3.1-8b-instant"  # fast, free-tier, good enough for this
 
-# Loaded once at import time — same pattern as risk_predictor.py, avoids
-# reloading the embedding model / index on every request.
-print("Loading RAG index and embedding model...")
-
-with open(os.path.join(INDEX_DIR, "config.json")) as f:
-    _config = json.load(f)
-
-_embedding_model = SentenceTransformer(_config["embedding_model"])
-_index = faiss.read_index(os.path.join(INDEX_DIR, "knowledge.index"))
-
-with open(os.path.join(INDEX_DIR, "passages.json"), encoding="utf-8") as f:
-    _passages = json.load(f)
-
-with open(os.path.join(INDEX_DIR, "sources.json"), encoding="utf-8") as f:
-    _sources = json.load(f)
-
-print(f"RAG index loaded: {_index.ntotal} passages ready for retrieval.")
-
+# FIX: previously all loaded eagerly at module import time — meaning
+# every one of these (the embedding model, the FAISS index, the full
+# passage/source lists) loaded into memory the moment the server
+# started, regardless of whether anyone ever used the chatbot. Combined
+# with torch, pandas, and everything else the app already loads at
+# startup, this pushed total memory usage past Render's free-tier RAM
+# limit, causing the OS to kill the process (exit code 137 = SIGKILL)
+# before it could even finish starting up.
+#
+# Now these load lazily — only the first time retrieve() or
+# answer_question() is actually called — via _ensure_loaded(). This
+# spreads memory usage out over time instead of front-loading all of it
+# at startup, so /health, /search, /stats, etc. all work fine even
+# before anyone has used the chatbot yet.
+_embedding_model = None
+_index = None
+_passages = None
+_sources = None
 _groq_client = None
+
+
+def _ensure_loaded():
+    global _embedding_model, _index, _passages, _sources
+
+    if _embedding_model is not None:
+        return  # already loaded, nothing to do
+
+    print("Loading RAG index and embedding model (lazy, first use)...")
+
+    # Import here, not at module level — sentence_transformers itself
+    # pulls in torch and other heavy dependencies, so delaying the
+    # import delays that memory cost too, not just the model weights.
+    from sentence_transformers import SentenceTransformer
+
+    with open(os.path.join(INDEX_DIR, "config.json")) as f:
+        config = json.load(f)
+
+    _embedding_model = SentenceTransformer(config["embedding_model"])
+    _index = faiss.read_index(os.path.join(INDEX_DIR, "knowledge.index"))
+
+    with open(os.path.join(INDEX_DIR, "passages.json"), encoding="utf-8") as f:
+        _passages = json.load(f)
+
+    with open(os.path.join(INDEX_DIR, "sources.json"), encoding="utf-8") as f:
+        _sources = json.load(f)
+
+    print(f"RAG index loaded: {_index.ntotal} passages ready for retrieval.")
 
 
 def _get_groq_client() -> Groq:
@@ -71,6 +98,8 @@ def retrieve(question: str, top_k: int = TOP_K):
     Embeds the question and returns the top_k most similar passages,
     along with their source metadata and similarity scores.
     """
+    _ensure_loaded()
+
     query_embedding = _embedding_model.encode([question], convert_to_numpy=True)
     query_embedding = query_embedding.astype("float32")
     faiss.normalize_L2(query_embedding)
