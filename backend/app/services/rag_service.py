@@ -54,38 +54,28 @@ def _ensure_loaded():
     global _embedding_model, _index, _passages, _sources
 
     if _embedding_model is not None:
-        return
+        return  # already loaded, nothing to do
 
-    print("STEP 1 - Starting _ensure_loaded")
+    print("Loading RAG index and embedding model (lazy, first use)...")
 
-    print("STEP 2 - Importing SentenceTransformer")
+    # Import here, not at module level — sentence_transformers itself
+    # pulls in torch and other heavy dependencies, so delaying the
+    # import delays that memory cost too, not just the model weights.
     from sentence_transformers import SentenceTransformer
-    print("STEP 3 - SentenceTransformer imported")
 
-    print("STEP 4 - Opening config")
     with open(os.path.join(INDEX_DIR, "config.json")) as f:
         config = json.load(f)
-    print("STEP 5 - Config loaded")
 
-    print("STEP 6 - Loading embedding model")
     _embedding_model = SentenceTransformer(config["embedding_model"])
-    print("STEP 7 - Embedding model loaded")
-
-    print("STEP 8 - Loading FAISS index")
     _index = faiss.read_index(os.path.join(INDEX_DIR, "knowledge.index"))
-    print("STEP 9 - FAISS loaded")
 
-    print("STEP 10 - Loading passages")
     with open(os.path.join(INDEX_DIR, "passages.json"), encoding="utf-8") as f:
         _passages = json.load(f)
-    print("STEP 11 - Passages loaded")
 
-    print("STEP 12 - Loading sources")
     with open(os.path.join(INDEX_DIR, "sources.json"), encoding="utf-8") as f:
         _sources = json.load(f)
-    print("STEP 13 - Sources loaded")
 
-    print(f"RAG index loaded: {_index.ntotal} passages ready.")
+    print(f"RAG index loaded: {_index.ntotal} passages ready for retrieval.")
 
 
 def _get_groq_client() -> Groq:
@@ -133,56 +123,75 @@ def retrieve(question: str, top_k: int = TOP_K):
 
 def answer_question(question: str) -> dict:
     """
-    Hybrid RAG pipeline: retrieves relevant passages and grounds the
-    answer in them when they're genuinely relevant, but also lets the
-    model use its own general medical/genetics knowledge to answer
-    naturally — the way a real conversational assistant would, rather
-    than refusing anything not explicitly in the knowledge base.
+    Hybrid RAG + LLM pipeline, following this priority order:
+      1. Retrieve relevant passages from the project's knowledge base.
+      2. If retrieval is relevant, ground the answer in it and say so.
+      3. If retrieval is insufficient, fall back to the LLM's own
+         general medical/genetics knowledge — and say so explicitly.
+      4. Never hallucinate: if confidence is genuinely low even with
+         general knowledge, the model is instructed to state that
+         limitation rather than invent an answer.
+      5. Answer naturally, like a knowledgeable conversational
+         assistant — not a rigid retrieval-only bot.
+
+    Supports genetic diseases, genes, mutations, inheritance patterns,
+    CRISPR, DNA/FASTA/VCF-related questions, general genetics topics,
+    and ordinary conversational follow-ups.
     """
     retrieved = retrieve(question)
 
-    # Only include retrieved passages as grounding if they're actually
-    # relevant to the question (similarity above a reasonable threshold).
-    # Below this, the retrieved passages are likely noise (the FAISS
-    # search always returns *something*, even for unrelated questions),
-    # so we let the model answer from general knowledge instead of
-    # force-feeding it irrelevant context.
+    # Only treat retrieved passages as usable grounding if they're
+    # actually relevant — FAISS always returns *something*, even for
+    # unrelated questions, so a similarity floor prevents irrelevant
+    # passages from being presented as if they were the source.
     RELEVANCE_THRESHOLD = 0.35
     relevant = [r for r in retrieved if r["similarity"] >= RELEVANCE_THRESHOLD]
+
+    base_persona = (
+        "You are the PreGene-AI clinical assistant — a knowledgeable, "
+        "conversational genetics and genomics expert, similar in tone to "
+        "a helpful AI assistant like ChatGPT, but medically responsible. "
+        "You help with genetic diseases, genes, mutations, inheritance "
+        "patterns, CRISPR strategies, DNA/FASTA/VCF-related questions, "
+        "general genetics topics, and ordinary conversational "
+        "follow-ups — not just questions matching a fixed document set."
+    )
+
+    honesty_rules = (
+        "Follow this priority order strictly:\n"
+        "1. If the reference passages below are relevant to the "
+        "question, use them as your primary source and say so plainly "
+        "(e.g. 'Based on our knowledge base...'), citing which passage "
+        "number(s) you used, like [1] or [2][3].\n"
+        "2. If the reference passages are missing, irrelevant, or only "
+        "partially answer the question, use your own general medical/"
+        "genetics knowledge to fill the gap — and say so plainly (e.g. "
+        "'This isn't in our knowledge base, but based on general "
+        "genetics knowledge...') so the person always knows which parts "
+        "came from the project's data versus your general training.\n"
+        "3. NEVER present something as verified/sourced when it wasn't. "
+        "If you're genuinely uncertain even drawing on general "
+        "knowledge, say so explicitly rather than guessing confidently "
+        "— e.g. 'I'm not fully certain about this specific detail; you "
+        "should verify with a clinical genetics reference or "
+        "professional.'\n"
+        "4. Keep the tone natural, warm, and conversational — like "
+        "talking to a knowledgeable colleague, not a rigid document "
+        "lookup tool."
+    )
 
     if relevant:
         context = "\n\n".join(
             f"[{i+1}] {r['passage']}" for i, r in enumerate(relevant)
         )
-        system_prompt = (
-            "You are the PreGene-AI clinical assistant — a knowledgeable, "
-            "conversational genetics and genomics expert, similar in tone "
-            "to a helpful AI assistant like ChatGPT. You can answer both "
-            "specific questions using the reference passages below AND "
-            "general questions using your own broad medical/genetics "
-            "knowledge, the same way a real expert would draw on both a "
-            "specific patient chart and their general training.\n\n"
-            "When the reference passages below are relevant to the "
-            "question, use them and cite which one(s) you used, like [1] "
-            "or [2][3] — this keeps your clinical claims grounded and "
-            "verifiable. For background, definitional, or general "
-            "questions (e.g. 'what is X condition', 'how does Y work'), "
-            "answer naturally and conversationally using your own "
-            "knowledge, without forcing a citation if the passages don't "
-            "directly cover it. Keep answers clear, warm, and "
-            "appropriately concise — a paragraph or two unless more "
-            "detail is clearly wanted."
-        )
-        user_prompt = f"Reference passages:\n{context}\n\nQuestion: {question}"
+        system_prompt = f"{base_persona}\n\n{honesty_rules}"
+        user_prompt = f"Reference passages from our knowledge base:\n{context}\n\nQuestion: {question}"
     else:
-        # No sufficiently relevant passages retrieved — answer as a
-        # general knowledgeable assistant instead of saying "I don't know."
         system_prompt = (
-            "You are the PreGene-AI clinical assistant — a knowledgeable, "
-            "conversational genetics and genomics expert, similar in tone "
-            "to a helpful AI assistant like ChatGPT. Answer the user's "
-            "question using your own broad medical/genetics knowledge. "
-            "Keep answers clear, warm, and appropriately concise."
+            f"{base_persona}\n\n{honesty_rules}\n\n"
+            "No relevant passages were found in the knowledge base for "
+            "this question — answer using your own general medical/"
+            "genetics knowledge, and say so plainly per rule 2 above."
         )
         user_prompt = question
 
@@ -193,8 +202,8 @@ def answer_question(question: str) -> dict:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.4,  # slightly higher than pure-retrieval mode — allows more natural phrasing while staying factual
-        max_tokens=600,
+        temperature=0.4,
+        max_tokens=700,
     )
 
     answer = response.choices[0].message.content
