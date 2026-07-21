@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   startPrediction,
   getPredictionStatus,
@@ -12,9 +13,44 @@ import { DEFAULT_PATIENT_FORM_DATA } from "@/types/prediction";
 
 const POLL_INTERVAL_MS = 1000;
 
+interface LocationState {
+  prefill?: Partial<PatientFormData>;
+}
+
+/**
+ * Merges any fields passed via router state (e.g. from UploadPage after
+ * a VCF was parsed) on top of the defaults. Only keys that are actually
+ * present in `prefill` override the default — everything else stays at
+ * its normal starting value, and the user can edit any of it before
+ * submitting.
+ */
+function buildInitialFormData(prefill?: Partial<PatientFormData>): PatientFormData {
+  if (!prefill) {
+    return DEFAULT_PATIENT_FORM_DATA;
+  }
+
+  return {
+    ...DEFAULT_PATIENT_FORM_DATA,
+    ...prefill,
+  };
+}
+
 export function usePrediction() {
-  const [formData, setFormData] = useState<PatientFormData>(
-    DEFAULT_PATIENT_FORM_DATA
+  const location = useLocation();
+  const locationState = location.state as LocationState | null;
+  const prefill = locationState?.prefill;
+
+  const [formData, setFormData] = useState<PatientFormData>(() =>
+    buildInitialFormData(prefill)
+  );
+
+  // Names of fields that arrived pre-filled from an upload, so the UI
+  // (PatientInputForm) can optionally show an "Auto-detected" badge
+  // next to them. Recomputed only from the prefill that was present on
+  // first render — editing a field afterwards doesn't remove its badge,
+  // since the value genuinely did come from the upload originally.
+  const [prefilledFields] = useState<(keyof PatientFormData)[]>(() =>
+    prefill ? (Object.keys(prefill) as (keyof PatientFormData)[]) : []
   );
 
   const [job, setJob] = useState<PredictionJobStatus | null>(null);
@@ -114,5 +150,6 @@ export function usePrediction() {
     runPrediction,
     resetForm,
     setResult,
+    prefilledFields,
   };
 }
