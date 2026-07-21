@@ -1,8 +1,9 @@
-﻿import { AlertCircle, Brain, Dna } from "lucide-react";
+﻿import { AlertCircle, Brain, Dna, ArrowRight } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import PatientInputForm from "@/components/analysis/PatientInputForm";
 import RiskAssessmentPanel from "@/components/analysis/RiskAssessmentPanel";
 import AnalysisPipeline from "@/components/analysis/AnalysisPipeline";
+import { Button } from "@/components/ui/button";
 import { usePrediction } from "@/hooks/usePrediction";
 
 export default function AnalysisPage() {
@@ -15,6 +16,8 @@ export default function AnalysisPage() {
     error,
     runPrediction,
     prefilledFields,
+    isResultReady,
+    revealResult,
   } = usePrediction();
 
   return (
@@ -77,7 +80,21 @@ export default function AnalysisPage() {
 
         <div className="xl:col-span-3">
           {isLoading && job ? (
-            <AnalysisPipeline job={job} />
+            <div className="space-y-4">
+              <AnalysisPipeline job={job} />
+
+              {isResultReady && (
+                <div className="flex flex-col items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+                  <p className="text-sm font-medium text-emerald-700">
+                    Analysis complete — your results are ready.
+                  </p>
+                  <Button onClick={revealResult}>
+                    View Results
+                    <ArrowRight className="ml-1.5 h-4 w-4" aria-hidden="true" />
+                  </Button>
+                </div>
+              )}
+            </div>
           ) : result ? (
             <RiskAssessmentPanel result={result} />
           ) : (
