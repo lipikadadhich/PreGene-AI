@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from app.routes.dna_analysis_router import dna_analysis_router
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
@@ -219,6 +220,7 @@ print("Chat:", type(chat_router))
 print("ML Insights:", type(ml_insights_router))
 
 app.include_router(prediction_router)
+app.include_router(dna_analysis_router)
 app.include_router(report_router)
 app.include_router(history_router)
 app.include_router(upload_router)
