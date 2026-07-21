@@ -84,6 +84,9 @@ export default {
       maxWidth: {
         "8xl": "90rem",
       },
+      animation: {
+        "spin-slow": "spin 3s linear infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
