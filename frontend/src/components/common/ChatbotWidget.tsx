@@ -3,8 +3,9 @@ import { MessageCircle, X, Send, Loader2, FileText } from "lucide-react";
 import { API_URL } from "@/services/api";
 
 interface ChatSource {
-  disease: string;
-  source: string;
+  category: string;
+  source_document: string;
+  page?: number | null;
   similarity: number;
 }
 
@@ -154,9 +155,10 @@ export default function ChatbotWidget() {
                       </p>
                       {msg.sources.map((src, j) => (
                         <p key={j} className="text-[11px] text-slate-500">
-                          {src.disease}{" "}
+                          {src.category.replace(/_/g, " ")}{" "}
                           <span className="text-slate-400">
-                            ({src.source.replace("_", " ")}, match{" "}
+                            ({src.source_document}
+                            {src.page != null ? `, p.${src.page}` : ""}, match{" "}
                             {(src.similarity * 100).toFixed(0)}%)
                           </span>
                         </p>
