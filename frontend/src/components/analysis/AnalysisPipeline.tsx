@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   CheckCircle2,
   Loader2,
@@ -9,6 +10,7 @@ import {
   Scissors,
   HeartPulse,
   FileText,
+  Dna,
 } from "lucide-react";
 import type { PipelineStage, PredictionJobStatus } from "@/services/api";
 
@@ -65,17 +67,53 @@ interface AnalysisPipelineProps {
 }
 
 export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
+  const completedCount = useMemo(
+    () => STAGES.filter((s) => job.stages[s.key] === "complete").length,
+    [job.stages]
+  );
+
+  const progressPercent = Math.round((completedCount / STAGES.length) * 100);
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-slate-900">
-          Running Analysis
-        </h2>
-        <p className="mt-1 text-sm text-slate-500">
-          {job.overall_status === "error"
-            ? "The analysis stopped due to an error below."
-            : "Each step below reflects real backend progress."}
-        </p>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <Dna
+              className={`h-5 w-5 text-brand-600 ${
+                job.overall_status === "running" ? "animate-spin-slow" : ""
+              }`}
+              aria-hidden="true"
+            />
+            Running Analysis
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            {job.overall_status === "error"
+              ? "The analysis stopped due to an error below."
+              : "Each step below reflects real backend progress."}
+          </p>
+        </div>
+
+        <div className="text-right">
+          <span className="text-2xl font-semibold tabular-nums text-slate-900">
+            {progressPercent}%
+          </span>
+        </div>
+      </div>
+
+      <div
+        className="mb-6 h-2 w-full overflow-hidden rounded-full bg-slate-100"
+        role="progressbar"
+        aria-valuenow={progressPercent}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className={`h-full rounded-full transition-all duration-700 ease-out ${
+            job.overall_status === "error" ? "bg-red-500" : "bg-brand-500"
+          }`}
+          style={{ width: `${progressPercent}%` }}
+        />
       </div>
 
       <ol className="space-y-3">
@@ -90,18 +128,18 @@ export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
           return (
             <li
               key={stage.key}
-              className={`flex items-center gap-4 rounded-xl border p-4 transition-colors duration-200 ${
+              className={`flex items-center gap-4 rounded-xl border p-4 transition-all duration-300 ${
                 isError
                   ? "border-red-200 bg-red-50"
                   : isRunning
-                  ? "border-brand-200 bg-brand-50"
+                  ? "border-brand-200 bg-brand-50 shadow-sm ring-1 ring-brand-100"
                   : isComplete
                   ? "border-emerald-200 bg-emerald-50"
                   : "border-slate-200 bg-slate-50"
               }`}
             >
               <span
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${
+                className={`relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-colors duration-300 ${
                   isError
                     ? "bg-red-100 text-red-600"
                     : isRunning
@@ -111,12 +149,15 @@ export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
                     : "bg-slate-100 text-slate-400"
                 }`}
               >
-                <Icon className="h-5 w-5" />
+                {isRunning && (
+                  <span className="absolute inset-0 animate-ping rounded-xl bg-brand-300 opacity-40" />
+                )}
+                <Icon className="relative h-5 w-5" />
               </span>
 
               <div className="min-w-0 flex-1">
                 <p
-                  className={`text-sm font-medium ${
+                  className={`text-sm font-medium transition-colors duration-300 ${
                     isError
                       ? "text-red-700"
                       : isRunning
@@ -129,7 +170,7 @@ export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
                   {stage.label}
                 </p>
                 <p className="mt-0.5 text-xs text-slate-400">
-                  {stage.description}
+                  {isRunning ? "In progress..." : stage.description}
                 </p>
               </div>
 
