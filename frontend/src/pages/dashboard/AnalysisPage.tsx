@@ -1,4 +1,4 @@
-﻿import { AlertCircle, Brain } from "lucide-react";
+﻿import { AlertCircle, Brain, Dna } from "lucide-react";
 import PageHeader from "@/components/common/PageHeader";
 import PatientInputForm from "@/components/analysis/PatientInputForm";
 import RiskAssessmentPanel from "@/components/analysis/RiskAssessmentPanel";
@@ -14,6 +14,7 @@ export default function AnalysisPage() {
     isLoading,
     error,
     runPrediction,
+    prefilledFields,
   } = usePrediction();
 
   return (
@@ -26,6 +27,17 @@ export default function AnalysisPage() {
           { label: "AI Risk Assessment" },
         ]}
       />
+
+      {prefilledFields.length > 0 && (
+        <div className="flex gap-2 rounded-xl border border-brand-200 bg-brand-50 p-4 text-brand-700">
+          <Dna className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+          <span className="text-sm">
+            Some fields below were pre-filled from your uploaded DNA file.
+            Review them and edit anything that needs correcting before
+            running the analysis.
+          </span>
+        </div>
+      )}
 
       <div className="grid gap-8 xl:grid-cols-5">
         <div className="xl:col-span-2">
