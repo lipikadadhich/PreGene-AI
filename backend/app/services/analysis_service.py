@@ -1,3 +1,5 @@
+import time
+
 from ai.recommendation.crispr_engine import recommend_crispr
 from ai.models.risk_predictor import predict_risk
 from ai.genetics.inheritance_engine import autosomal_recessive
@@ -21,6 +23,14 @@ REQUIRED_FIELDS = [
     "father_genotype",
     "mother_genotype",
 ]
+
+# Small, deliberate pause after each stage starts, purely so the frontend's
+# stage-by-stage animation (AnalysisPipeline.tsx / DnaLoader) has time to
+# actually render each step. The underlying computations below are all
+# still real — this does not change what's computed, only how quickly the
+# UI would otherwise blow past states that are genuinely happening but
+# finish in milliseconds. 6 stages * 0.4s = ~2.4s total added latency.
+STAGE_ANIMATION_DELAY_SECONDS = 0.4
 
 
 def _validate_input(data: dict) -> None:
@@ -64,11 +74,13 @@ def run_analysis_job(job_id: str, data: dict) -> None:
     try:
         # --- Stage 1: Validate Input ---------------------------------
         job_service.start_stage(job_id, "validate_input")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         _validate_input(data)
         job_service.complete_stage(job_id, "validate_input")
 
         # --- Stage 2: Inheritance Analysis ---------------------------
         job_service.start_stage(job_id, "inheritance")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         inheritance_result = autosomal_recessive(
             data["father_genotype"],
             data["mother_genotype"],
@@ -81,6 +93,7 @@ def run_analysis_job(job_id: str, data: dict) -> None:
         # `disease` is now passed through too, since it's one of the
         # features the model was actually trained on.
         job_service.start_stage(job_id, "risk_prediction")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         risk_score, risk_level = predict_risk(
             data["disease"],
             data["inheritance"],
@@ -93,16 +106,19 @@ def run_analysis_job(job_id: str, data: dict) -> None:
 
         # --- Stage 4: CRISPR Recommendation ---------------------------
         job_service.start_stage(job_id, "crispr_recommendation")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         recommendation = recommend_crispr(data["disease"])
         job_service.complete_stage(job_id, "crispr_recommendation")
 
         # --- Stage 5: Genetic Counselling ------------------------------
         job_service.start_stage(job_id, "counselling")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         counselling = generate_counselling(inheritance_result, risk_score)
         job_service.complete_stage(job_id, "counselling")
 
         # --- Stage 6: Report Generation ---------------------------------
         job_service.start_stage(job_id, "report_generation")
+        time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
 
         result = {
             "recommendation": recommendation,
