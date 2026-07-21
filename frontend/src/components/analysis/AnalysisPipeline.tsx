@@ -10,9 +10,9 @@ import {
   Scissors,
   HeartPulse,
   FileText,
-  Dna,
 } from "lucide-react";
 import type { PipelineStage, PredictionJobStatus } from "@/services/api";
+import DnaLoader from "@/components/common/DnaLoader";
 
 interface StageMeta {
   key: PipelineStage;
@@ -74,17 +74,20 @@ export default function AnalysisPipeline({ job }: AnalysisPipelineProps) {
 
   const progressPercent = Math.round((completedCount / STAGES.length) * 100);
 
+  const currentStageLabel = useMemo(() => {
+    const running = STAGES.find((s) => job.stages[s.key] === "running");
+    return running?.label ?? "Analyzing genetic data...";
+  }, [job.stages]);
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+      {job.overall_status !== "error" && (
+        <DnaLoader label={currentStageLabel} />
+      )}
+
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-            <Dna
-              className={`h-5 w-5 text-brand-600 ${
-                job.overall_status === "running" ? "animate-spin-slow" : ""
-              }`}
-              aria-hidden="true"
-            />
+          <h2 className="text-lg font-semibold text-slate-900">
             Running Analysis
           </h2>
           <p className="mt-1 text-sm text-slate-500">
