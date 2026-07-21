@@ -1,0 +1,32 @@
+{
+  "accuracy": 0.8533333333333334,
+  "weighted_f1": 0.8526111278598466,
+  "classification_report": {
+    "Benign": {
+      "precision": 0.8099415204678363,
+      "recall": 0.9233333333333333,
+      "f1-score": 0.8629283489096573,
+      "support": 300.0
+    },
+    "Pathogenic": {
+      "precision": 0.9108527131782945,
+      "recall": 0.7833333333333333,
+      "f1-score": 0.8422939068100358,
+      "support": 300.0
+    },
+    "accuracy": 0.8533333333333334,
+    "macro avg": {
+      "precision": 0.8603971168230654,
+      "recall": 0.8533333333333333,
+      "f1-score": 0.8526111278598465,
+      "support": 600.0
+    },
+    "weighted avg": {
+      "precision": 0.8603971168230654,
+      "recall": 0.8533333333333334,
+      "f1-score": 0.8526111278598466,
+      "support": 600.0
+    }
+  },
+  "note": "Trained on a SYNTHETIC dataset with biologically-motivated motif patterns (premature stop codons, CpG depletion, disruptive short motifs) \u2014 not real clinical variant data. See generate_sequence_dataset.py for full documentation and the real-data upgrade path (ClinVar)."
+}

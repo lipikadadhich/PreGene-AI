@@ -1,0 +1,7 @@
+{
+  "classes": [
+    "Benign",
+    "Pathogenic"
+  ],
+  "sequence_length": 200
+}
