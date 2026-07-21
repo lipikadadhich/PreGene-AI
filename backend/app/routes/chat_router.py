@@ -12,8 +12,9 @@ class ChatRequest(BaseModel):
 
 
 class ChatSource(BaseModel):
-    disease: str
-    source: str
+    category: str
+    source_document: str
+    page: int | None = None
     similarity: float
 
 
@@ -25,10 +26,11 @@ class ChatResponse(BaseModel):
 @router.post("/", response_model=ChatResponse)
 def chat(request: ChatRequest):
     """
-    RAG-based clinical chatbot. Retrieves relevant passages from the
-    knowledge base + master dataset via FAISS, then generates an answer
-    grounded in those passages using Groq's LLM API. Returns both the
-    answer and which sources were used, for transparency.
+    RAG-based clinical chatbot. Retrieves relevant chunks from the
+    medical knowledge base (app/knowledge/<category>/) via TF-IDF
+    similarity, then generates an answer grounded in those chunks using
+    Groq's LLM API. Returns both the answer and which sources were used
+    (category, source document, page) for transparency.
     """
     if not request.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
