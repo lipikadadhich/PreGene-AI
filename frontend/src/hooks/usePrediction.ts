@@ -58,6 +58,13 @@ export function usePrediction() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // The backend has finished (job.overall_status === "complete") but the
+  // result hasn't been shown yet — the loading animation keeps playing
+  // until the user calls revealResult(). This keeps holding the actual
+  // finished result so nothing is lost while we wait for that click.
+  const [isResultReady, setIsResultReady] = useState(false);
+  const pendingResultRef = useRef<PredictionResult | null>(null);
+
   // Holds the interval id so it can be cleared from anywhere (poll success,
   // poll failure, or unmount) without stale-closure issues.
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -98,6 +105,8 @@ export function usePrediction() {
     setError("");
     setResult(null);
     setJob(null);
+    setIsResultReady(false);
+    pendingResultRef.current = null;
 
     try {
       const { job_id } = await startPrediction(formData);
@@ -109,8 +118,11 @@ export function usePrediction() {
 
           if (status.overall_status === "complete") {
             stopPolling();
-            setResult(status.result as unknown as PredictionResult);
-            setIsLoading(false);
+            // Hold the result and keep isLoading true — the animation
+            // (AnalysisPipeline / DnaLoader) keeps playing until the
+            // user explicitly calls revealResult().
+            pendingResultRef.current = status.result as unknown as PredictionResult;
+            setIsResultReady(true);
           } else if (status.overall_status === "error") {
             stopPolling();
             setError(status.error || "Prediction failed. Please try again.");
@@ -131,6 +143,18 @@ export function usePrediction() {
     }
   };
 
+  /**
+   * Called when the user clicks "View Results". Only meaningful once
+   * isResultReady is true — swaps the held result into view and stops
+   * the loading animation.
+   */
+  const revealResult = () => {
+    if (!pendingResultRef.current) return;
+    setResult(pendingResultRef.current);
+    setIsLoading(false);
+    setIsResultReady(false);
+  };
+
   const resetForm = () => {
     stopPolling();
     setFormData(DEFAULT_PATIENT_FORM_DATA);
@@ -138,6 +162,8 @@ export function usePrediction() {
     setResult(null);
     setError("");
     setIsLoading(false);
+    setIsResultReady(false);
+    pendingResultRef.current = null;
   };
 
   return {
@@ -151,5 +177,7 @@ export function usePrediction() {
     resetForm,
     setResult,
     prefilledFields,
+    isResultReady,
+    revealResult,
   };
 }
