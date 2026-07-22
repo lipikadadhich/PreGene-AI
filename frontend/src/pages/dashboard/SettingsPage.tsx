@@ -196,7 +196,7 @@ function sessionIconFor(kind: SessionKind) {
 }
 
 export default function SettingsPage() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -255,9 +255,9 @@ export default function SettingsPage() {
           "(prefers-color-scheme: dark)",
         ).matches;
         const desired = prefersDark ? "dark" : "light";
-        if (theme !== desired) toggleTheme();
-      } else if (themeChoice !== theme) {
-        toggleTheme();
+        setTheme(desired);
+      } else {
+        setTheme(themeChoice);
       }
     };
 
@@ -270,7 +270,7 @@ export default function SettingsPage() {
       return () => mq.removeEventListener("change", listener);
     }
     return undefined;
-  }, [themeChoice, theme, toggleTheme]);
+  }, [themeChoice, setTheme]);
 
   const profileDirty = useMemo(
     () =>
