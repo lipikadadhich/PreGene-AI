@@ -1,71 +1,41 @@
-import { Dna, Scissors, Percent, ShieldCheck, BookOpen, Info } from "lucide-react";
-import type { PredictionRecommendation } from "@/services/api";
+import { Scissors, Dna, Gauge, Sparkles } from "lucide-react";
+import type { Recommendation } from "@/types/prediction";
 import { getTierStyle } from "@/lib/evidenceTier";
 import CrisprEvidenceNotice from "@/components/shared/CrisprEvidenceNotice";
 
 interface CRISPRCardProps {
-  recommendation: PredictionRecommendation;
+  recommendation: Recommendation;
 }
 
-function StatusPill({ value }: { value?: string | null }) {
-  if (!value) {
-    return <span className="text-sm text-slate-300">—</span>;
-  }
-  return (
-    <span className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-      {value}
-    </span>
-  );
-}
-
-function Tile({
-  label,
-  value,
-  mono,
-  wide,
-}: {
-  label: string;
-  value: React.ReactNode;
-  mono?: boolean;
-  wide?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-xl border border-slate-200 bg-white p-4 ${
-        wide ? "sm:col-span-2" : ""
-      }`}
-    >
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
-        {label}
-      </p>
-      <p
-        className={`mt-1.5 break-words text-sm font-semibold text-slate-800 ${
-          mono ? "font-mono" : ""
-        }`}
-      >
-        {value ?? "—"}
-      </p>
-    </div>
-  );
-}
-
+/**
+ * Displays the CRISPR gene-editing portion of a prediction result. For
+ * curated/validated evidence tiers, shows gene, mutation, editing method,
+ * and success rate as before. For theoretical/no-strategy tiers, renders
+ * the shared CrisprEvidenceNotice — the same component used on every
+ * other page that can show a CRISPR recommendation.
+ */
 export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
   const isTotallyUnavailable = recommendation.available === false && !recommendation.gene;
   const tierStyle = getTierStyle(recommendation.evidence_tier);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <div className="mb-6 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-12px_rgba(15,23,42,0.08)]">
+      <div
+        aria-hidden="true"
+        className={`absolute inset-x-0 top-0 h-[3px] rounded-t-2xl bg-gradient-to-r ${tierStyle.cardAccentClasses}`}
+      />
+
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3.5">
           <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
-            <Dna className="h-5 w-5" />
+            <Scissors className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">
+            <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
               CRISPR Recommendation
             </h3>
-            <p className="text-sm text-slate-500">
-              Suggested gene editing approach based on the identified mutation.
+            <p className="mt-0.5 text-sm text-slate-400">
+              Suggested precision gene-editing intervention.
             </p>
           </div>
         </div>
@@ -80,67 +50,83 @@ export default function CRISPRCard({ recommendation }: CRISPRCardProps) {
       </div>
 
       {isTotallyUnavailable ? (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
-          <Info className="h-5 w-5 flex-shrink-0" />
-          <p className="text-sm">
-            {recommendation.message ||
-              "CRISPR recommendation is currently unavailable for this disease."}
-          </p>
+        <div className="mt-6">
+          <CrisprEvidenceNotice recommendation={recommendation} />
         </div>
       ) : tierStyle.hasValidatedDetails ? (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Tile label="Gene" value={recommendation.gene} mono wide />
-            <Tile label="Mutation" value={recommendation.mutation} mono wide />
-            <Tile
-              label="Editing Method"
-              value={
-                <span className="inline-flex items-center gap-1.5">
-                  <Scissors className="h-3.5 w-3.5 text-slate-400" />
-                  {recommendation.editing_method}
-                </span>
-              }
-            />
-            <Tile
-              label="Success Rate"
-              value={
-                <span className="inline-flex items-center gap-1.5">
-                  <Percent className="h-3.5 w-3.5 text-slate-400" />
-                  {recommendation.success_rate}%
-                </span>
-              }
-            />
-            <Tile
-              label="Clinical Status"
-              value={<StatusPill value={recommendation.clinical_status} />}
-            />
-            <Tile
-              label="Evidence Level"
-              value={<StatusPill value={recommendation.evidence} />}
-            />
-            {recommendation.reference && (
-              <Tile
-                label="Reference"
-                value={
-                  <span className="inline-flex items-center gap-1.5">
-                    <BookOpen className="h-3.5 w-3.5 text-slate-400" />
-                    {recommendation.reference}
-                  </span>
-                }
-                wide
-              />
-            )}
-          </div>
-
-          {recommendation.success_rate != null && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-sm text-emerald-700">
-              <ShieldCheck className="h-4 w-4 flex-shrink-0" />
-              Success rate reflects reported clinical/preclinical outcomes for this editing approach — not a guarantee for any individual patient.
+          <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Target gene
+              </dt>
+              <dd className="mt-1 font-mono text-sm font-semibold text-slate-900">
+                {recommendation.gene || "—"}
+              </dd>
             </div>
-          )}
+            <div>
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Mutation
+              </dt>
+              <dd className="mt-1 font-mono text-sm font-semibold text-slate-900">
+                {recommendation.mutation || "—"}
+              </dd>
+            </div>
+            <div className="sm:col-span-2">
+              <dt className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Editing method
+              </dt>
+              <dd className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-slate-900">
+                <Dna className="h-4 w-4 text-brand-500" aria-hidden="true" />
+                {recommendation.editing_method || "—"}
+              </dd>
+            </div>
+          </dl>
+
+          <div className="mt-6">
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1.5 font-medium text-slate-700">
+                <Gauge className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+                Predicted success rate
+              </span>
+              <span className="font-semibold text-slate-900">
+                {recommendation.success_rate ?? 0}%
+              </span>
+            </div>
+            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-brand-500 transition-all duration-700"
+                style={{ width: `${recommendation.success_rate ?? 0}%` }}
+              />
+            </div>
+          </div>
         </>
       ) : (
-        <CrisprEvidenceNotice recommendation={recommendation} />
+        <div className="mt-6">
+          <CrisprEvidenceNotice recommendation={recommendation} />
+        </div>
+      )}
+
+      {/* AI-generated reasoning — grounded explanation from the LLM
+          enrichment layer (ai/services/llm_enrichment_service.py).
+          Shown whenever it's present, regardless of evidence tier,
+          since it's just additional context on top of whichever
+          recommendation state is already being displayed above. */}
+      {recommendation.ai_reasoning && (
+        <div className="mt-6 flex gap-2.5 rounded-xl border border-brand-100 bg-brand-50/60 p-4">
+          <Sparkles
+            className="h-4 w-4 flex-shrink-0 text-brand-500"
+            aria-hidden="true"
+          />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
+              AI Reasoning
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-700">
+              {recommendation.ai_reasoning}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );

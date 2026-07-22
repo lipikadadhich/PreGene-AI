@@ -105,15 +105,26 @@ def run_analysis_job(job_id: str, data: dict) -> None:
         job_service.complete_stage(job_id, "risk_prediction")
 
         # --- Stage 4: CRISPR Recommendation ---------------------------
+        # NEW: recommend_crispr() now also attempts to attach a real,
+        # LLM-generated `ai_reasoning` explanation grounded in the
+        # recommendation's own fields (see ai/services/
+        # llm_enrichment_service.py). Falls back to no ai_reasoning
+        # (rather than failing) if the LLM is unavailable.
         job_service.start_stage(job_id, "crispr_recommendation")
         time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
         recommendation = recommend_crispr(data["disease"])
         job_service.complete_stage(job_id, "crispr_recommendation")
 
         # --- Stage 5: Genetic Counselling ------------------------------
+        # NEW: disease_name is now passed through so
+        # generate_counselling() can attempt real, LLM-personalized
+        # counselling notes grounded in the actual risk_score and
+        # inheritance probabilities, instead of only picking one of
+        # three fixed templates by risk bracket. Falls back to the
+        # original templates if the LLM is unavailable.
         job_service.start_stage(job_id, "counselling")
         time.sleep(STAGE_ANIMATION_DELAY_SECONDS)
-        counselling = generate_counselling(inheritance_result, risk_score)
+        counselling = generate_counselling(inheritance_result, risk_score, data["disease"])
         job_service.complete_stage(job_id, "counselling")
 
         # --- Stage 6: Report Generation ---------------------------------
