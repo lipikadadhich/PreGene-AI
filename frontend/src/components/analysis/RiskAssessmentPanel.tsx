@@ -8,6 +8,7 @@ import {
   Printer,
   Tag,
   Clock,
+  Sparkles,
 } from "lucide-react";
 import type { PredictionResult } from "@/types/prediction";
 import CRISPRCard from "./CRISPRCard";
@@ -315,6 +316,23 @@ export default function RiskAssessmentPanel({
               dotClass="bg-rose-500"
             />
           </div>
+
+          {/* NEW: LLM-generated plain-language explanation of what these
+              exact percentages mean for this couple, grounded strictly
+              in the numbers above (see ai/services/
+              llm_enrichment_service.py -> generate_inheritance_explanation).
+              Only rendered when present — omitted entirely (not an
+              error state) if the LLM was unavailable when the analysis
+              ran, so this is purely additive and never blocks the
+              existing bars/percentages from displaying. */}
+          {(result.inheritance as { explanation?: string }).explanation && (
+            <div className="mt-6 flex gap-3 rounded-xl border border-amber-100 bg-amber-50/60 p-4">
+              <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+              <p className="text-sm leading-6 text-slate-700">
+                {(result.inheritance as { explanation?: string }).explanation}
+              </p>
+            </div>
+          )}
         </div>
       )}
 
