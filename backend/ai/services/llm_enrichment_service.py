@@ -1,17 +1,15 @@
 """
 llm_enrichment_service.py
 
-Adds a real generative-AI layer on top of currently rule-based /
+Adds a real generative-AI layer on top of two currently rule-based /
 templated parts of the pipeline:
 
   1. CRISPR recommendation reasoning (the `ai_reasoning` field already
      defined in the Recommendation type, previously left unpopulated).
   2. Genetic counselling notes (previously three fixed template blocks
      keyed only on a risk_score bracket).
-  3. Inheritance probability explanation (previously just raw numbers
-     with no plain-language interpretation for the couple).
 
-All functions are strictly GROUNDED: they pass the LLM the real,
+Both functions are strictly GROUNDED: they pass the LLM the real,
 already-computed clinical data (disease name, gene, evidence tier, risk
 score, inheritance probabilities) and instruct it to explain/phrase that
 data conversationally — never to invent new facts, statistics, or
@@ -20,9 +18,9 @@ This keeps the underlying clinical logic (evidence tiers, risk model,
 inheritance math) as the source of truth; the LLM's job is explanation
 and tone, not decision-making.
 
-All functions fail SAFE: if the LLM call fails for any reason (missing
+Both functions fail SAFE: if the LLM call fails for any reason (missing
 API key, network issue, rate limit), they fall back to the original
-deterministic text/None rather than raising - so an LLM outage never
+deterministic text rather than raising - so a chatbot/LLM outage never
 breaks the core analysis pipeline.
 
 Requires GROQ_API_KEY (same variable already used by rag_service.py).
@@ -163,60 +161,41 @@ def generate_counselling_notes(
     return points if points else None
 
 
-def generate_inheritance_explanation(
-    disease_name: str,
-    father_genotype: str,
-    mother_genotype: str,
-    inheritance_result: dict,
-) -> str | None:
+def generate_disease_explanation(disease_data: dict) -> str | None:
     """
-    Generates a plain-language explanation of what this specific
-    couple's computed inheritance probabilities actually mean for a
-    future pregnancy, grounded strictly in the real Healthy/Carrier/
-    Affected percentages that inheritance_engine.py already computed
-    from their genotypes.
+    Generates a plain-language explanation of a disease for the Disease
+    Library page, grounded strictly in the dataset's own fields for that
+    disease (Disease, Gene, Gene_Name, Age_Of_Onset, Inheritance_Type,
+    and any other fields present in disease_data — whatever the dataset
+    row actually contains). Does not invent new medical facts, drug
+    names, statistics, or studies beyond what's in the given data plus
+    genuinely general, well-established background knowledge about how
+    that inheritance pattern or gene type generally works.
 
-    Returns None if the LLM is unavailable, the call fails, or the
-    inheritance_result contains an Error key (invalid genotype input) —
-    callers should fall back to omitting this explanation (the raw
-    percentages/bars in RiskAssessmentPanel.tsx already convey the
-    numbers on their own) rather than showing a broken or fabricated
-    explanation.
+    Returns None if the LLM is unavailable or the call fails — callers
+    should treat None as "explanation unavailable right now" and show a
+    simple message, rather than a broken/fabricated one.
     """
-    if inheritance_result.get("Error"):
-        # Invalid genotype strings were entered - there are no real
-        # percentages to explain, so don't ask the LLM to narrate
-        # nonsense numbers.
-        return None
-
-    healthy = inheritance_result.get("Healthy")
-    carrier = inheritance_result.get("Carrier")
-    affected = inheritance_result.get("Affected")
-
-    if healthy is None or carrier is None or affected is None:
-        return None
-
     system_prompt = (
-        "You are a genetic counsellor explaining Punnett-square-based "
-        "inheritance probabilities to expecting parents in plain, warm, "
-        "reassuring language. You are given the disease name, both "
-        "parents' genotypes, and the exact computed percentages for "
-        "Healthy / Carrier / Affected outcomes for a future pregnancy. "
-        "Explain in 2-3 sentences what these specific numbers mean for "
-        "THIS couple, in everyday language a non-scientist would "
-        "understand. Use ONLY the numbers given — do not recalculate, "
-        "round differently, or invent any other statistic, and do not "
-        "add general disease information beyond what these probabilities "
-        "convey. Keep the tone calm and supportive, not alarming, "
-        "regardless of the risk level."
+        "You are a genetics educator explaining a hereditary disease to "
+        "a patient or prospective parent who has no medical background. "
+        "You are given the disease's known data fields from a curated "
+        "clinical dataset (gene, inheritance pattern, typical age of "
+        "onset, etc.). Write a short, warm, plain-language explanation "
+        "(3-4 sentences) covering what the condition is, what the "
+        "affected gene does at a high level, and what the inheritance "
+        "pattern means for family planning — using ONLY the fields "
+        "given below, plus general, well-established genetics "
+        "background knowledge (e.g. what 'autosomal recessive' means in "
+        "general). Do not invent specific statistics, treatments, drug "
+        "names, or studies that aren't part of general medical "
+        "knowledge. If a field is missing, simply don't mention it "
+        "rather than guessing."
     )
 
-    user_prompt = (
-        f"Disease: {disease_name}\n"
-        f"Father genotype: {father_genotype}\n"
-        f"Mother genotype: {mother_genotype}\n"
-        f"Computed probabilities for a future pregnancy — "
-        f"Healthy: {healthy}%, Carrier: {carrier}%, Affected: {affected}%"
+    facts = "\n".join(
+        f"{key}: {value}" for key, value in disease_data.items() if value
     )
+    user_prompt = f"Disease data:\n{facts}"
 
-    return _call_llm(system_prompt, user_prompt, max_tokens=200)
+    return _call_llm(system_prompt, user_prompt, max_tokens=250)
