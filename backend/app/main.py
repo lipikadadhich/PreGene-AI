@@ -17,6 +17,7 @@ from app.routes.auth_router import auth_router
 from app.routes.chat_router import chat_router
 from app.routes.ml_insights_router import ml_insights_router
 from app.services.dataset_service import dataset_service
+from ai.services.llm_enrichment_service import generate_disease_explanation
 
 
 @asynccontextmanager
@@ -98,6 +99,25 @@ def get_diseases():
     }
 
 
+def _get_disease_row_as_dict(disease_name: str) -> dict | None:
+    """
+    Shared lookup used by both /disease/{disease_name} and
+    /disease/{disease_name}/explain, so both endpoints stay consistent
+    about how a disease row is found and sanitized to native Python
+    types. Returns None if no matching disease is found.
+    """
+    df = dataset_service.get_dataset()
+    result = df[df["Disease"].str.lower() == disease_name.lower()]
+    if result.empty:
+        return None
+
+    row = result.iloc[0]
+    return {
+        key: (None if pd.isna(value) else str(value))
+        for key, value in row.to_dict().items()
+    }
+
+
 @app.get("/disease/{disease_name}")
 def get_disease(disease_name: str):
     try:
@@ -129,6 +149,47 @@ def get_disease(disease_name: str):
         traceback.print_exc()
         return {
             "error": str(e)
+        }
+
+
+@app.get("/disease/{disease_name}/explain")
+def explain_disease(disease_name: str):
+    """
+    Generates a plain-language, LLM-powered explanation of a disease for
+    the Disease Library page's "Explain with AI" button, grounded
+    strictly in that disease's own dataset row (see
+    ai/services/llm_enrichment_service.py: generate_disease_explanation).
+
+    Fails soft: if the disease isn't found, or the LLM is unavailable,
+    this returns a clear `available: false` response with a message
+    rather than a 500 — since this is a supplementary UI feature, not a
+    core clinical result.
+    """
+    try:
+        data = _get_disease_row_as_dict(disease_name)
+        if data is None:
+            return {
+                "available": False,
+                "message": "Disease not found",
+            }
+
+        explanation = generate_disease_explanation(data)
+        if explanation is None:
+            return {
+                "available": False,
+                "message": "AI explanation is currently unavailable. Please try again in a moment.",
+            }
+
+        return {
+            "available": True,
+            "explanation": explanation,
+        }
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return {
+            "available": False,
+            "message": "Failed to generate explanation",
         }
 
 
