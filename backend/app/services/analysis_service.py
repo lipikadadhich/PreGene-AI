@@ -4,6 +4,7 @@ from ai.recommendation.crispr_engine import recommend_crispr
 from ai.models.risk_predictor import predict_risk
 from ai.genetics.inheritance_engine import autosomal_recessive
 from ai.explainability.genetic_counsellor import generate_counselling
+from ai.services.llm_enrichment_service import generate_inheritance_explanation
 from app.services.report_service import (
     generate_report,
     create_pdf,
@@ -85,6 +86,25 @@ def run_analysis_job(job_id: str, data: dict) -> None:
             data["father_genotype"],
             data["mother_genotype"],
         )
+
+        # NEW: attaches a real, LLM-generated plain-language explanation
+        # of what THIS couple's exact computed percentages mean, grounded
+        # strictly in those numbers (see ai/services/
+        # llm_enrichment_service.py). Adds an "explanation" key onto the
+        # existing dict — Healthy/Carrier/Affected/Error stay exactly as
+        # autosomal_recessive() already returns them, so every existing
+        # caller of inheritance_result keeps working unchanged. Silently
+        # omitted (key not added) if the LLM is unavailable or the
+        # genotypes were invalid.
+        explanation = generate_inheritance_explanation(
+            data["disease"],
+            data["father_genotype"],
+            data["mother_genotype"],
+            inheritance_result,
+        )
+        if explanation:
+            inheritance_result["explanation"] = explanation
+
         job_service.complete_stage(job_id, "inheritance")
 
         # --- Stage 3: AI Risk Prediction ------------------------------
