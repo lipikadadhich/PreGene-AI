@@ -1,15 +1,17 @@
 """
 llm_enrichment_service.py
 
-Adds a real generative-AI layer on top of two currently rule-based /
+Adds a real generative-AI layer on top of currently rule-based /
 templated parts of the pipeline:
 
   1. CRISPR recommendation reasoning (the `ai_reasoning` field already
      defined in the Recommendation type, previously left unpopulated).
   2. Genetic counselling notes (previously three fixed template blocks
      keyed only on a risk_score bracket).
+  3. Inheritance probability explanation (previously just raw numbers
+     with no plain-language interpretation for the couple).
 
-Both functions are strictly GROUNDED: they pass the LLM the real,
+All functions are strictly GROUNDED: they pass the LLM the real,
 already-computed clinical data (disease name, gene, evidence tier, risk
 score, inheritance probabilities) and instruct it to explain/phrase that
 data conversationally — never to invent new facts, statistics, or
@@ -18,9 +20,9 @@ This keeps the underlying clinical logic (evidence tiers, risk model,
 inheritance math) as the source of truth; the LLM's job is explanation
 and tone, not decision-making.
 
-Both functions fail SAFE: if the LLM call fails for any reason (missing
+All functions fail SAFE: if the LLM call fails for any reason (missing
 API key, network issue, rate limit), they fall back to the original
-deterministic text rather than raising - so a chatbot/LLM outage never
+deterministic text/None rather than raising - so an LLM outage never
 breaks the core analysis pipeline.
 
 Requires GROQ_API_KEY (same variable already used by rag_service.py).
@@ -159,3 +161,62 @@ def generate_counselling_notes(
     # One guidance point per line; drop any accidental blank lines.
     points = [line.strip("-• ").strip() for line in raw.split("\n") if line.strip()]
     return points if points else None
+
+
+def generate_inheritance_explanation(
+    disease_name: str,
+    father_genotype: str,
+    mother_genotype: str,
+    inheritance_result: dict,
+) -> str | None:
+    """
+    Generates a plain-language explanation of what this specific
+    couple's computed inheritance probabilities actually mean for a
+    future pregnancy, grounded strictly in the real Healthy/Carrier/
+    Affected percentages that inheritance_engine.py already computed
+    from their genotypes.
+
+    Returns None if the LLM is unavailable, the call fails, or the
+    inheritance_result contains an Error key (invalid genotype input) —
+    callers should fall back to omitting this explanation (the raw
+    percentages/bars in RiskAssessmentPanel.tsx already convey the
+    numbers on their own) rather than showing a broken or fabricated
+    explanation.
+    """
+    if inheritance_result.get("Error"):
+        # Invalid genotype strings were entered - there are no real
+        # percentages to explain, so don't ask the LLM to narrate
+        # nonsense numbers.
+        return None
+
+    healthy = inheritance_result.get("Healthy")
+    carrier = inheritance_result.get("Carrier")
+    affected = inheritance_result.get("Affected")
+
+    if healthy is None or carrier is None or affected is None:
+        return None
+
+    system_prompt = (
+        "You are a genetic counsellor explaining Punnett-square-based "
+        "inheritance probabilities to expecting parents in plain, warm, "
+        "reassuring language. You are given the disease name, both "
+        "parents' genotypes, and the exact computed percentages for "
+        "Healthy / Carrier / Affected outcomes for a future pregnancy. "
+        "Explain in 2-3 sentences what these specific numbers mean for "
+        "THIS couple, in everyday language a non-scientist would "
+        "understand. Use ONLY the numbers given — do not recalculate, "
+        "round differently, or invent any other statistic, and do not "
+        "add general disease information beyond what these probabilities "
+        "convey. Keep the tone calm and supportive, not alarming, "
+        "regardless of the risk level."
+    )
+
+    user_prompt = (
+        f"Disease: {disease_name}\n"
+        f"Father genotype: {father_genotype}\n"
+        f"Mother genotype: {mother_genotype}\n"
+        f"Computed probabilities for a future pregnancy — "
+        f"Healthy: {healthy}%, Carrier: {carrier}%, Affected: {affected}%"
+    )
+
+    return _call_llm(system_prompt, user_prompt, max_tokens=200)
