@@ -17,6 +17,23 @@ interface LocationState {
   prefill?: Partial<PatientFormData>;
 }
 
+interface UsePredictionOptions {
+  /**
+   * When true, the result is held (isResultReady flips true, but
+   * `result` stays null) once the backend finishes, until the caller
+   * explicitly calls revealResult(). Used by AnalysisPage so its
+   * loading animation (AnalysisPipeline / DnaLoader) keeps playing
+   * until the user clicks "View Results".
+   *
+   * Defaults to false so every OTHER page using this shared hook
+   * (CrisprRecommendationsPage, DiseasePredictionPage, etc. — none of
+   * which render a "View Results" button) keeps its original
+   * behavior: `result` populates immediately once the backend
+   * finishes, with no extra manual step.
+   */
+  holdResultUntilReveal?: boolean;
+}
+
 /**
  * Merges any fields passed via router state (e.g. from UploadPage after
  * a VCF was parsed) on top of the defaults. Only keys that are actually
@@ -35,7 +52,9 @@ function buildInitialFormData(prefill?: Partial<PatientFormData>): PatientFormDa
   };
 }
 
-export function usePrediction() {
+export function usePrediction(options: UsePredictionOptions = {}) {
+  const { holdResultUntilReveal = false } = options;
+
   const location = useLocation();
   const locationState = location.state as LocationState | null;
   const prefill = locationState?.prefill;
@@ -58,7 +77,8 @@ export function usePrediction() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // The backend has finished (job.overall_status === "complete") but the
+  // Only meaningfully used when holdResultUntilReveal is true. The
+  // backend has finished (job.overall_status === "complete") but the
   // result hasn't been shown yet — the loading animation keeps playing
   // until the user calls revealResult(). This keeps holding the actual
   // finished result so nothing is lost while we wait for that click.
@@ -118,11 +138,21 @@ export function usePrediction() {
 
           if (status.overall_status === "complete") {
             stopPolling();
-            // Hold the result and keep isLoading true — the animation
-            // (AnalysisPipeline / DnaLoader) keeps playing until the
-            // user explicitly calls revealResult().
-            pendingResultRef.current = status.result as unknown as PredictionResult;
-            setIsResultReady(true);
+            const finishedResult = status.result as unknown as PredictionResult;
+
+            if (holdResultUntilReveal) {
+              // Hold the result and keep isLoading true — the caller's
+              // animation keeps playing until it explicitly calls
+              // revealResult().
+              pendingResultRef.current = finishedResult;
+              setIsResultReady(true);
+            } else {
+              // Default behavior: show the result immediately, exactly
+              // as this hook worked before the hold-until-reveal
+              // feature was added for AnalysisPage.
+              setResult(finishedResult);
+              setIsLoading(false);
+            }
           } else if (status.overall_status === "error") {
             stopPolling();
             setError(status.error || "Prediction failed. Please try again.");
@@ -144,9 +174,10 @@ export function usePrediction() {
   };
 
   /**
-   * Called when the user clicks "View Results". Only meaningful once
-   * isResultReady is true — swaps the held result into view and stops
-   * the loading animation.
+   * Called when the user clicks "View Results". Only relevant when
+   * holdResultUntilReveal is true — swaps the held result into view and
+   * stops the loading animation. No-op otherwise (result already shows
+   * immediately in the default mode).
    */
   const revealResult = () => {
     if (!pendingResultRef.current) return;
