@@ -64,6 +64,29 @@ export async function getDiseaseDetail(
 }
 
 // ==============================
+// Disease AI Explanation (Disease Library "Explain with AI")
+// ==============================
+export interface DiseaseExplanationResponse {
+  available: boolean;
+  explanation?: string;
+  message?: string;
+}
+
+export async function getDiseaseExplanation(
+  diseaseName: string
+): Promise<DiseaseExplanationResponse> {
+  const response = await fetch(
+    `${API_URL}/disease/${encodeURIComponent(diseaseName)}/explain`
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch AI explanation");
+  }
+
+  return response.json();
+}
+
+// ==============================
 // Dataset Statistics
 // ==============================
 export interface DatasetStatsResponse {

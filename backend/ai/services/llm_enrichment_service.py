@@ -10,6 +10,8 @@ templated parts of the pipeline:
      keyed only on a risk_score bracket).
   3. Inheritance probability explanation (previously just raw numbers
      with no plain-language interpretation for the couple).
+  4. Report summary paragraph (top of the PDF/report).
+  5. Disease Library "Explain with AI" plain-language explanation.
 
 All functions are strictly GROUNDED: they pass the LLM the real,
 already-computed clinical data (disease name, gene, evidence tier, risk
@@ -259,3 +261,44 @@ def generate_report_summary(
     )
 
     return _call_llm(system_prompt, user_prompt, max_tokens=180)
+
+
+def generate_disease_explanation(disease_data: dict) -> str | None:
+    """
+    Generates a plain-language explanation of a disease for the Disease
+    Library page's "Explain with AI" button, grounded strictly in the
+    dataset's own fields for that disease (Disease, Gene, Gene_Name,
+    Age_Of_Onset, Inheritance_Type, and any other fields present in
+    disease_data — whatever the dataset row actually contains). Does
+    not invent new medical facts, drug names, statistics, or studies
+    beyond what's in the given data plus genuinely general,
+    well-established background knowledge about how that inheritance
+    pattern or gene type generally works.
+
+    Returns None if the LLM is unavailable or the call fails — callers
+    should treat None as "explanation unavailable right now" and show a
+    simple message, rather than a broken/fabricated one.
+    """
+    system_prompt = (
+        "You are a genetics educator explaining a hereditary disease to "
+        "a patient or prospective parent who has no medical background. "
+        "You are given the disease's known data fields from a curated "
+        "clinical dataset (gene, inheritance pattern, typical age of "
+        "onset, etc.). Write a short, warm, plain-language explanation "
+        "(3-4 sentences) covering what the condition is, what the "
+        "affected gene does at a high level, and what the inheritance "
+        "pattern means for family planning — using ONLY the fields "
+        "given below, plus general, well-established genetics "
+        "background knowledge (e.g. what 'autosomal recessive' means in "
+        "general). Do not invent specific statistics, treatments, drug "
+        "names, or studies that aren't part of general medical "
+        "knowledge. If a field is missing, simply don't mention it "
+        "rather than guessing."
+    )
+
+    facts = "\n".join(
+        f"{key}: {value}" for key, value in disease_data.items() if value
+    )
+    user_prompt = f"Disease data:\n{facts}"
+
+    return _call_llm(system_prompt, user_prompt, max_tokens=250)
