@@ -18,6 +18,7 @@ from reportlab.platypus import (
 )
 
 from ai.recommendation.evidence_tiers import tier_has_validated_details
+from ai.services.llm_enrichment_service import generate_report_summary
 
 
 # ---------------------------------------------------------------------------
@@ -35,6 +36,8 @@ WHITE = colors.white
 AMBER_BG = colors.HexColor("#FEF3C7")
 AMBER_BORDER = colors.HexColor("#F59E0B")
 AMBER_TEXT = colors.HexColor("#92400E")
+SUMMARY_BG = colors.HexColor("#EAF1FA")
+SUMMARY_BORDER = colors.HexColor("#2C5F9E")
 
 RISK_COLORS = {
     "LOW": colors.HexColor("#1E8449"),
@@ -109,6 +112,15 @@ def _build_styles():
         fontSize=9.5,
         leading=14,
         textColor=AMBER_TEXT,
+        alignment=TA_JUSTIFY,
+    ))
+
+    styles.add(ParagraphStyle(
+        name="SummaryText",
+        fontName="Helvetica",
+        fontSize=10,
+        leading=15,
+        textColor=PRIMARY_BLUE,
         alignment=TA_JUSTIFY,
     ))
 
@@ -202,6 +214,25 @@ def _notice_box(text):
     return table
 
 
+def _summary_box(text):
+    """
+    Blue-tinted box for the LLM-generated plain-language summary
+    paragraph at the top of the report — visually distinct from the
+    amber notice box (which signals a caveat/limitation) since this is
+    a normal, confident overview, not a warning.
+    """
+    table = Table([[_p(text, "SummaryText")]], colWidths=[180 * mm], hAlign="LEFT")
+    table.setStyle(TableStyle([
+        ("BOX", (0, 0), (-1, -1), 0.75, SUMMARY_BORDER),
+        ("BACKGROUND", (0, 0), (-1, -1), SUMMARY_BG),
+        ("LEFTPADDING", (0, 0), (-1, -1), 10),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 10),
+        ("TOPPADDING", (0, 0), (-1, -1), 8),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+    ]))
+    return table
+
+
 # ---------------------------------------------------------------------------
 # Header / Footer drawing
 # ---------------------------------------------------------------------------
@@ -260,8 +291,23 @@ def _make_page_callback(report_id):
 # be used as: the PDF filename, the value stored in history_service, and
 # the id used for GET /report/{report_id} lookups. No keys are renamed or
 # restructured beyond adding report_id.
+#
+# NEW: also generates a plain-language `summary` paragraph via
+# generate_report_summary(), grounded strictly in disease/risk_score/
+# risk_level/evidence_level — added as an additional key on the report
+# dict. Every existing key stays exactly as before, so nothing that
+# already reads this dict (history_service, create_pdf's existing
+# sections) needs to change. If the LLM is unavailable, `summary` is
+# simply None and create_pdf() skips rendering that section.
 # ---------------------------------------------------------------------------
 def generate_report(result, patient):
+
+    summary = generate_report_summary(
+        patient.get("disease", "Unknown disease"),
+        result["risk_score"],
+        result["risk_level"],
+        result.get("evidence_level", "Unknown"),
+    )
 
     report = {
         "report_id": _generate_report_id(),
@@ -277,7 +323,9 @@ def generate_report(result, patient):
 
         "inheritance": result["inheritance"],
 
-        "counselling": result["counselling"]
+        "counselling": result["counselling"],
+
+        "summary": summary,
     }
 
     return report
@@ -332,6 +380,16 @@ def create_pdf(report):
     ]))
     story.append(meta_table)
     story.append(HRFlowable(width="100%", thickness=0.75, color=BORDER_GREY, spaceAfter=10))
+
+    # -------------------- Summary (NEW) --------------------
+    # Only rendered when the LLM actually produced one — if unavailable,
+    # the report simply starts at Patient Summary as it always did,
+    # rather than showing an empty or fabricated overview.
+    summary = report.get("summary")
+    if summary:
+        story.append(Paragraph("Summary", STYLES["SectionHeading"]))
+        story.append(_summary_box(summary))
+        story.append(Spacer(1, 10))
 
     # -------------------- Patient Summary --------------------
     story.append(Paragraph("Patient Summary", STYLES["SectionHeading"]))
@@ -423,6 +481,15 @@ def create_pdf(report):
         _p(inheritance_probability["Affected"]),
     ]
     story.append(_grid_table(prob_header, [prob_row], col_widths=[60 * mm, 60 * mm, 60 * mm]))
+    story.append(Spacer(1, 6))
+
+    # NEW: LLM-generated explanation of what these percentages mean for
+    # this specific couple (see ai/services/llm_enrichment_service.py ->
+    # generate_inheritance_explanation, wired in via analysis_service.py).
+    # Only rendered when present.
+    inheritance_explanation = inheritance_probability.get("explanation")
+    if inheritance_explanation:
+        story.append(Paragraph(_p(inheritance_explanation).text, STYLES["BodyJustify"]))
     story.append(Spacer(1, 10))
 
     # -------------------- AI Genetic Counselling --------------------
